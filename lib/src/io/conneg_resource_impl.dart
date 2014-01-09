@@ -1,4 +1,4 @@
-part of restlib.server.connector;
+part of restlib.server.io;
 
 class _ToStringResponseWriter implements ResponseWriter {
   final MediaRange mediaRange;

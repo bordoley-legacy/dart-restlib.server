@@ -4,7 +4,7 @@ import "dart:io";
 
 import "package:unittest/mock.dart";
 
-import "package:restlib_server/connector.dart";
+import "package:restlib_server/io.dart";
 import "package:restlib_server/server.dart";
 
 class MockAuthorizer extends Mock implements Authorizer {}

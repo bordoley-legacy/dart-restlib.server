@@ -1,4 +1,4 @@
-part of restlib.server.connector;
+part of restlib.server.io;
 
 abstract class IOApplication implements Application {
   factory IOApplication(final Iterable<IOResource> resources, [final IOResource defaultResource = IOResource.NOT_FOUND]) =>

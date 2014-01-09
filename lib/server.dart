@@ -13,13 +13,13 @@ import "package:restlib_parsing/parsing.dart";
 import "package:restlib_core/data.dart";
 import "package:restlib_core/http.dart";
 
-part "src/application.dart";
-part "src/authorizer.dart";
-part "src/future_responses.dart";
-part "src/resource.dart";
-part "src/routable_uri.dart";
-part "src/route.dart";
-part "src/uniform_resource.dart";
+part "src/server/application.dart";
+part "src/server/authorizer.dart";
+part "src/server/future_responses.dart";
+part "src/server/resource.dart";
+part "src/server/routable_uri.dart";
+part "src/server/route.dart";
+part "src/server/uniform_resource.dart";
 
 typedef Application ApplicationSupplier(Request);
 
