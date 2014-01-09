@@ -12,7 +12,7 @@ import "package:restlib_parsing/parsing.dart";
 
 import "package:restlib_core/data.dart";
 import "package:restlib_core/http.dart";
-import "package:restlib_core/server.dart";
+import "package:restlib_server/server.dart";
 
 part "src/connector/conneg_resource.dart";
 part "src/connector/conneg_resource_impl.dart";

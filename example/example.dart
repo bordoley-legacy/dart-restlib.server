@@ -10,10 +10,12 @@ import "package:mime/mime.dart";
 
 import "package:path/path.dart";
 
-import "package:restlib_core/connector.dart";
+
 import "package:restlib_core/data.dart";
 import "package:restlib_core/http.dart";
-import "package:restlib_core/server.dart";
+
+import "package:restlib_server/connector.dart";
+import "package:restlib_server/server.dart";
 
 import "package:restlib_common/collections.dart";
 import "package:restlib_common/objects.dart";
