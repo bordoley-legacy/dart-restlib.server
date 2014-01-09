@@ -32,7 +32,7 @@ HttpServerListener httpServerListener(final IOApplicationSupplier applicationSup
 
 @visibleForTesting
 Future processRequest(final HttpRequest serverRequest, final IOApplicationSupplier applicationSupplier, final String scheme) {  
-  Future _writeResponse(final Request request, final Response response, Future write(Request request, Response response, IOSink msgSink)) {
+  Future _writeResponse(final Request request, final Response response, Future write(Request request, Response response, StreamSink<List<int>> msgSink)) {
     checkNotNull(response);
     
     writeHttpResponse(response, serverRequest.response);

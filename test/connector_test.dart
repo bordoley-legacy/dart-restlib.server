@@ -3,6 +3,7 @@ library restlib.connector_test;
 import "dart:async";
 import "dart:io";
 
+import "package:restlib_server/io.dart";
 import "package:restlib_server/connector.dart";
 import "package:restlib_server/server.dart";
 

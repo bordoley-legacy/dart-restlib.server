@@ -1,7 +1,6 @@
 library restlib.example;
 
 import "dart:async";
-import "dart:math";
 import "dart:io";
 
 import "package:logging/logging.dart";
@@ -9,7 +8,6 @@ import "package:logging/logging.dart";
 import "package:mime/mime.dart";
 
 import "package:path/path.dart";
-
 
 import "package:restlib_core/data.dart";
 import "package:restlib_core/http.dart";
@@ -23,7 +21,6 @@ import "package:restlib_common/objects.dart";
 
 part "src/echo_resource.dart";
 part "src/file_resource.dart";
-part "src/range_resource.dart";
 
 void main() {     
   hierarchicalLoggingEnabled = false;

@@ -2,6 +2,7 @@ library restlib.server;
 
 import "dart:async";
 import "dart:convert";
+import "dart:math";
 
 import "package:crypto/crypto.dart";
 
@@ -15,6 +16,7 @@ import "package:restlib_core/http.dart";
 
 part "src/server/application.dart";
 part "src/server/authorizer.dart";
+part "src/server/byte_range_resource.dart";
 part "src/server/future_responses.dart";
 part "src/server/resource.dart";
 part "src/server/routable_uri.dart";

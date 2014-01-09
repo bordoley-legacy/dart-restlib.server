@@ -24,40 +24,30 @@ class _FileResourceDelegate implements UniformResourceDelegate<FileSystemEntity>
             .then((final FileSystemEntityType type) =>
                 new PatternMatcher<FileSystemEntity>(
                     [inCaseOf(equals(FileSystemEntityType.FILE), (_) => 
-                        new File(filePath)),
+                        new ByteRangeFile(filePath)),
                      inCaseOf(equals(FileSystemEntityType.DIRECTORY), (_) => 
                          new Directory(filePath))])(type)
-                  .map((final FileSystemEntity entity) =>
-                      entity.stat().then((final FileStat stat) =>
-                          (new ResponseBuilder()
-                            ..status = Status.SUCCESS_OK
-                            ..entity = entity
-                            ..contentInfo = (entity is File) ? 
-                                ContentInfo.NONE.with_(mediaRange: mediaRangeForFile(entity)) : ContentInfo.NONE
-                            ..lastModified = stat.modified
-                          ).build()))      
-                  .orElse(CLIENT_ERROR_NOT_FOUND));
+                  .map((final FileSystemEntity entity) {
+                      final Future<int> lengthLookup = (entity is File) ? entity.length() : new Future.value(-1);
+                      
+                      return Future.wait([lengthLookup, entity.stat()])
+                        .then((final List results) => 
+                            (new ResponseBuilder()
+                              ..status = Status.SUCCESS_OK
+                              ..entity = entity
+                              ..contentInfo = (entity is File) ? 
+                                  ContentInfo.NONE.with_(
+                                    length: results[0],
+                                    mediaRange: mediaRangeForFile(entity)) : ContentInfo.NONE
+                              ..lastModified = results[1].modified
+                            ).build());
+                  }).orElse(CLIENT_ERROR_NOT_FOUND));
       }).orCompute(() => 
           new Future.error("route does not include a *path parameter"));
   }
 }
 
-Future writeFile(final Request request, final Response<File> response, final IOSink msgSink) =>
-    msgSink.addStream(
-        response.contentInfo.range
-          // Assume the type is ByteContentRange and let the code exception with internal server error
-          .map((final BytesContentRange range) {
-            // Assume the range is a ByteRangeResp at this point
-            final int firstBytePos = range.rangeResp.left.value.firstBytePosition;
-            final int lastBytePos =  range.rangeResp.left.value.lastBytePosition;
-            
-            // Assume at this point that the entity is guaranteed to exist
-            return response.entity.value.openRead(firstBytePos, lastBytePos);
-          }).orCompute(() => 
-              // Assume at this point that the entity is guaranteed to exist
-              response.entity.value.openRead()));
-
-Future writeDirectory(final Request request, final Response<Directory> response, final IOSink msgSink) {
+Future writeDirectory(final Request request, final Response<Directory> response, final StreamSink<List<int>> msgSink) {
   final StringBuffer buffer = 
       new StringBuffer("<!DOCTYPE html>\n<html><head>\n</head>\n<body>\n");
   
@@ -85,11 +75,9 @@ Option<Dictionary<MediaRange, ResponseWriter>> responseWriters(final entity) {
   } else if (entity is Directory) {
     mediaRange = MediaRange.TEXT_HTML;
     writer = writeDirectory;
-  } else if (entity is MultipartByteRange) {
-    mediaRange = 
-        MediaRange.MULTIPART_BYTE_RANGE.with_(parameters :
-              Persistent.EMPTY_SET_MULTIMAP.insert("boundary", entity.boundary));
-    writer = writeMultipartByteRange;
+  } else if (entity is Multipart) {
+    mediaRange = entity.type;
+    writer = writeMultipart;
   } else {
     mediaRange = MediaRange.TEXT_PLAIN;
     writer = writeString;
@@ -105,14 +93,42 @@ IOResource ioFileResource(final Directory directory) {
       new UniformResource(new _FileResourceDelegate(directory));
   
   final Resource<FileSystemEntity> rangeResource =
-      new ByteRangeResource(resource, 
-          (final entity) =>
-              entity is File,
-          (final File entity) =>
-              entity.length());
+      new Resource.byteRangeResource(resource);
   
   final ResponseWriterProvider responseWriterProvider = 
       new ResponseWriterProvider.onContentType(responseWriters);
   
   return new IOResource.conneg(rangeResource, (_) => Option.NONE, responseWriterProvider);
 }
+
+
+// FIXME: These really belong in some sort of common library. 
+// However restlib.server and restlib.server.io have no dependency on dart:io and 
+// restlib.connector seems like a weird place to put them
+class ByteRangeFile 
+    extends NoSuchMethodForwarder 
+    with ByteRangeSubRange
+    implements File, ByteRange {
+  ByteRangeFile(final String path) : super(new File(path));
+  
+  File get delegate =>
+      super.delegate;
+  
+  Stream<List<int>> asStream() =>
+      openRead();
+}
+
+Future writeFile(final Request request, final Response<File> response, final StreamSink<List<int>> msgSink) =>
+    msgSink.addStream(
+        response.contentInfo.range
+          // Assume the type is ByteContentRange and let the code exception with internal server error
+          .map((final BytesContentRange range) {
+            // Assume the range is a ByteRangeResp at this point
+            final int firstBytePos = range.rangeResp.left.value.firstBytePosition;
+            final int lastBytePos =  range.rangeResp.left.value.lastBytePosition;
+            
+            // Assume at this point that the entity is guaranteed to exist
+            return response.entity.value.openRead(firstBytePos, lastBytePos);
+          }).orCompute(() => 
+              // Assume at this point that the entity is guaranteed to exist
+              response.entity.value.openRead()));

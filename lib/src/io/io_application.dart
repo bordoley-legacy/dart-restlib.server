@@ -6,7 +6,7 @@ abstract class IOApplication implements Application {
   
   IOResource route(final Request request);
   
-  Future writeError(Request request, Response response, IOSink msgSink);
+  Future writeError(Request request, Response response, StreamSink<List<int>> msgSink);
 }
 
 // FIXME: Ideally this would inherit from ForwardingApplication
@@ -20,7 +20,7 @@ abstract class ForwardingIOApplication implements Forwarder, IOApplication {
   IOResource route(final Request request) =>
       delegate.route(request);
   
-  Future writeError(Request request, Response response, IOSink msgSink) =>
+  Future writeError(Request request, Response response, StreamSink<List<int>> msgSink) =>
       delegate.writeError(request, response, msgSink);
 }
 
@@ -37,6 +37,6 @@ class _IOApplicationImpl
   IOResource route(final Request request) =>
       delegate.route(request);
   
-  Future writeError(Request request, Response response, IOSink msgSink) =>
+  Future writeError(Request request, Response response, StreamSink<List<int>> msgSink) =>
       writeString(request, response, msgSink);
 }

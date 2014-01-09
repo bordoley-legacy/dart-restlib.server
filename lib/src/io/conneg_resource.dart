@@ -2,11 +2,11 @@ part of restlib.server.io;
 
 typedef Future<Request> RequestParser(final Request request, final Stream<List<int>> msgStream);
 typedef Option<RequestParser> RequestParserProvider(ContentInfo contentInfo);
-typedef Future ResponseEntityWriter(Request request, Response response, IOSink msgSink);
+typedef Future ResponseEntityWriter(Request request, Response response, StreamSink<List<int>> msgSink);
 typedef Option<ResponseWriter> ResponseWriterForMediaRange(MediaRange mediaRange);
 
 abstract class ResponseWriter {
-  factory ResponseWriter.forContentType(final MediaRange mediaRange, Future write(Request request, Response response, IOSink msgSink)) =>
+  factory ResponseWriter.forContentType(final MediaRange mediaRange, Future write(Request request, Response response, StreamSink<List<int>> msgSink)) =>
       new _ContentTypeResponseWriter(mediaRange, write);
   
   factory ResponseWriter.toString(final MediaRange contentType) =>
@@ -14,7 +14,7 @@ abstract class ResponseWriter {
   
   Response withContentInfo(Response response);
   
-  Future write(Request request, Response response, IOSink msgSink);
+  Future write(Request request, Response response, StreamSink<List<int>> msgSink);
 }
 
 abstract class ResponseWriterProvider {
@@ -83,7 +83,7 @@ Response addContentInfoToResponse(final Request request, final Response response
         .orCompute(() => 
             new Future.error("No parser provided to parse the request entity"));
   
-  Future write(final Request request, final Response response, final IOSink msgSink) =>
+  Future write(final Request request, final Response response, final StreamSink<List<int>> msgSink) =>
       response.entity
         .map((final entity) =>
             responseWriterProvider.apply(request, entity)

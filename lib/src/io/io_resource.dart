@@ -10,14 +10,14 @@ abstract class IOResource<T> implements Resource<T> {
           new _ConnegResource(delegate, requestParserProvider, responseWriterProvider);
   
   Future<Request<T>> parse(Request request, Stream<List<int>> msgStream);
-  Future write(Request request, Response response, IOSink msgSink);
+  Future write(Request request, Response response, StreamSink<List<int>> msgSink);
 }
 
 abstract class ForwardingIOResource<T> implements Forwarder, IOResource<T> {
   Future<Request<T>> parse(Request request, Stream<List<int>> msgStream) =>
       delegate.parse(request, msgStream);
   
-  Future write(Request request, Response response, IOSink msgSink) =>
+  Future write(Request request, Response response, StreamSink<List<int>> msgSink) =>
       delegate.write(request, response, msgSink);
 }
 
@@ -37,6 +37,6 @@ class _NotFoundIOResource implements IOResource {
   Future<Request> parse(final Request request, final Stream<List<int>> msgStream) =>
       throw new UnimplementedError("parse() methods called on IOResource.NOT_FOUND");
   
-  Future write(final Request request, final Response response, final IOSink msgSink) => 
+  Future write(final Request request, final Response response, final StreamSink<List<int>> msgSink) => 
       writeString(request, response, msgSink);
 }

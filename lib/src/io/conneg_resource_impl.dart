@@ -8,7 +8,7 @@ class _ToStringResponseWriter implements ResponseWriter {
   Response withContentInfo(final Response response) =>
       response.with_(contentInfo: response.contentInfo.with_(mediaRange: mediaRange));
   
-  Future write(final Request request, final Response response, final IOSink msgSink) =>
+  Future write(final Request request, final Response response, final StreamSink<List<int>> msgSink) =>
       writeString(request, response, msgSink);
 }
 
@@ -21,7 +21,7 @@ class _ContentTypeResponseWriter implements ResponseWriter {
   Response withContentInfo(Response response) =>
       response.with_(contentInfo: response.contentInfo.with_(mediaRange: mediaRange));
   
-  Future write(Request request, Response response, IOSink msgSink) =>
+  Future write(Request request, Response response, StreamSink<List<int>> msgSink) =>
       responseEntityWriter(request, response, msgSink);
 }
 

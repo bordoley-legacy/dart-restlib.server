@@ -11,6 +11,9 @@ abstract class Resource<T> {
     return new _AuthorizingResource<T> (next, authorizerMap);
   }
   
+  factory Resource.byteRangeResource(delegate) =>
+      new _ByteRangeResource(delegate);
+  
   Route get route;
 
   Future<Response> handle(Request request);
