@@ -1,0 +1,17 @@
+name: restlib_server
+description: A sample command-line application
+dependencies:
+  crypto: any
+  logging: any
+  mime: any
+  path: any
+  restlib_common:
+    git: https://code.google.com/p/dart-restlib.common/
+  restlib_core:
+    git: https://code.google.com/p/dart-restlib/  
+  restlib_parsing:
+    git: https://code.google.com/p/dart-restlib.parsing/
+dev_dependencies:
+  restlib_testing:
+    git: https://code.google.com/p/dart-restlib.testing/
+  unittest: any
