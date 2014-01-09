@@ -1,5 +1,10 @@
 part of restlib.example;
 
+MediaRange mediaRangeForFile(final file) =>
+    new Option(lookupMimeType(file.path))
+      .flatMap(MEDIA_RANGE.parse)
+      .orElse(MediaRange.APPLICATION_OCTET_STREAM);
+
 class _FileResourceDelegate implements UniformResourceDelegate<FileSystemEntity> {
   final bool requireETagForUpdate = false;
   final bool requireIfUnmodifiedSinceForUpdate = false;
@@ -27,6 +32,8 @@ class _FileResourceDelegate implements UniformResourceDelegate<FileSystemEntity>
                           (new ResponseBuilder()
                             ..status = Status.SUCCESS_OK
                             ..entity = entity
+                            ..contentInfo = (entity is File) ? 
+                                ContentInfo.NONE.with_(mediaRange: mediaRangeForFile(entity)) : ContentInfo.NONE
                             ..lastModified = stat.modified
                           ).build()))      
                   .orElse(CLIENT_ERROR_NOT_FOUND));
@@ -73,18 +80,16 @@ Option<Dictionary<MediaRange, ResponseWriter>> responseWriters(final entity) {
   ResponseEntityWriter writer;
   
   if (entity is File) {
-    mediaRange = new Option(lookupMimeType(entity.path))
-      .flatMap(MEDIA_RANGE.parse)
-      .orElse(MediaRange.APPLICATION_OCTET_STREAM);
+    mediaRange = mediaRangeForFile(entity);
     writer = writeFile;
   } else if (entity is Directory) {
     mediaRange = MediaRange.TEXT_HTML;
     writer = writeDirectory;
-  } else if (entity is MultipartByteStream) {
+  } else if (entity is MultipartByteRange) {
     mediaRange = 
         MediaRange.MULTIPART_BYTE_RANGE.with_(parameters :
               Persistent.EMPTY_SET_MULTIMAP.insert("boundary", entity.boundary));
-    writer = writeMultipartByteStream;
+    writer = writeMultipartByteRange;
   } else {
     mediaRange = MediaRange.TEXT_PLAIN;
     writer = writeString;
@@ -100,7 +105,7 @@ IOResource ioFileResource(final Directory directory) {
       new UniformResource(new _FileResourceDelegate(directory));
   
   final Resource<FileSystemEntity> rangeResource =
-      new RangeResource(resource, 
+      new ByteRangeResource(resource, 
           (final entity) =>
               entity is File,
           (final File entity) =>
