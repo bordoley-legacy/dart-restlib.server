@@ -35,7 +35,7 @@ void main() {
       new IOApplication(
           [ioAuthenticatedEchoResource(ROUTE.parse("/example/echo/authenticated/*path").value),
            ioEchoResource(ROUTE.parse("/example/echo/*path").value),
-           ioFileResource(fileDirectory)]);
+           ioFileResource(fileDirectory, Uri.parse("/example/file"))]);
   HttpServer
     .bind("0.0.0.0", 8080)
     .then(httpServerListener((final Request request) => app, "http"));

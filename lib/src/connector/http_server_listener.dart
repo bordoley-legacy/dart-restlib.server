@@ -35,6 +35,8 @@ Future processRequest(final HttpRequest serverRequest, final IOApplicationSuppli
   Future _writeResponse(final Request request, final Response response, Future write(Request request, Response response, StreamSink<List<int>> msgSink)) {
     checkNotNull(response);
     
+    _logger.finest(response.toString());
+    
     writeHttpResponse(response, serverRequest.response);
     
     if (response.entity.isNotEmpty) {

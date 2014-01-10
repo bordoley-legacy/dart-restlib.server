@@ -21,7 +21,7 @@ class _ByteRangeResource<T>
     if (response.status.statusClass != StatusClass.SUCCESS ||
         response.entity.isEmpty ||
         request.preferences.range.isEmpty) {
-      return new Future.value(response.with_(acceptedRangeUnits: [RangeUnit.BYTES]));
+      return new Future.value(response);
     }
     
     final entity = response.entity.value;
@@ -115,6 +115,14 @@ class _ByteRangeResource<T>
         ..addAcceptedRangeUnit(RangeUnit.BYTES)
       ).build();
     } else if (parts.length == 1) {
+      final Part part = parts.single;
+      
+      // Don't send a partial content response if the only part encapsulate
+      // the complete content.
+      if(response.contentInfo.length == part.contentInfo.length) {
+        return response; 
+      }
+      
       return response.with_(
           contentInfo: parts.first.contentInfo,
           status: Status.SUCCESS_PARTIAL_CONTENT);

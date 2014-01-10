@@ -8,10 +8,11 @@ MediaRange mediaRangeForFile(final file) =>
 class _FileResourceDelegate implements UniformResourceDelegate<FileSystemEntity> {
   final bool requireETagForUpdate = false;
   final bool requireIfUnmodifiedSinceForUpdate = false;
-  final Route route = ROUTE.parse("/example/file/*path").value;
+  final Route route;
   final Directory _base;
   
-  _FileResourceDelegate(this._base);
+  _FileResourceDelegate(this._base, final Uri path):
+    route = ROUTE.parse(path.path + "/*path").value;
   
   Future<Response> get(final Request request) {
     final Dictionary<String, String> params = 
@@ -88,9 +89,9 @@ Option<Dictionary<MediaRange, ResponseWriter>> responseWriters(final entity) {
           mediaRange, new ResponseWriter.forContentType(mediaRange, writer)));
 }
 
-IOResource ioFileResource(final Directory directory) {  
+IOResource ioFileResource(final Directory directory, final Uri path) {  
   final Resource<FileSystemEntity> resource = 
-      new UniformResource(new _FileResourceDelegate(directory));
+      new UniformResource(new _FileResourceDelegate(directory, path));
   
   final Resource<FileSystemEntity> rangeResource =
       new Resource.byteRangeResource(resource);
