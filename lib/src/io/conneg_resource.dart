@@ -18,7 +18,7 @@ abstract class ResponseWriter {
 }
 
 abstract class ResponseWriterProvider {
-  factory ResponseWriterProvider.onContentType(Option<Dictionary<MediaRange,ResponseWriter>> responseWritersForEntity(entity)) =>
+  factory ResponseWriterProvider.onContentType(Option<Dictionary<MediaRange,ResponseWriter>> responseWritersForEntity(Request request, Response response)) =>
       new _ContentTypeResponseWriterProvider(responseWritersForEntity);
   
   factory ResponseWriterProvider.alwaysProvides(final ResponseWriter responseWriter) =>
@@ -26,7 +26,7 @@ abstract class ResponseWriterProvider {
   
   FiniteSet<Header> get variesOn;
   
-  Option<ResponseWriter> apply(Request request, entity); 
+  Option<ResponseWriter> apply(Request request, Response response); 
 }
 
 class _ConnegResource<T> 
@@ -52,7 +52,7 @@ class _ConnegResource<T>
 Response addContentInfoToResponse(final Request request, final Response response) =>
     response.entity
       .map((final entity) =>
-          responseWriterProvider.apply(request, entity)
+          responseWriterProvider.apply(request, response)
             .map((final ResponseWriter writer) =>
                 writer.withContentInfo(response))
             .orElse(notAcceptableResponse)     
@@ -86,7 +86,7 @@ Response addContentInfoToResponse(final Request request, final Response response
   Future write(final Request request, final Response response, final StreamSink<List<int>> msgSink) =>
       response.entity
         .map((final entity) =>
-            responseWriterProvider.apply(request, entity)
+            responseWriterProvider.apply(request, response)
               .map((final ResponseWriter writer) =>
                   writer.write(request, response, msgSink))
               .orCompute(() =>

@@ -32,11 +32,11 @@ class _AlwaysProvidesResponseWriterProvider implements ResponseWriterProvider {
   _AlwaysProvidesResponseWriterProvider(final ResponseWriter responseWriter) :
     this.responseWriter = new Option(responseWriter);
   
-  Option<ResponseWriter> apply(Request request, entity) =>
+  Option<ResponseWriter> apply(Request request, Response response) =>
       responseWriter;
 }
 
-typedef Option<Dictionary<MediaRange,ResponseWriter>> _ResponseWritersForEntity(entity);
+typedef Option<Dictionary<MediaRange,ResponseWriter>> _ResponseWritersForEntity(Request request, Response response);
 
 class _ContentTypeResponseWriterProvider implements ResponseWriterProvider {
   final _ResponseWritersForEntity responseWritersForEntity;
@@ -45,8 +45,8 @@ class _ContentTypeResponseWriterProvider implements ResponseWriterProvider {
   
   FiniteSet<Header> variesOn = Persistent.EMPTY_SET.add(Header.ACCEPT);
   
-  Option<ResponseWriter> apply(Request request, entity) =>
-      responseWritersForEntity(entity)
+  Option<ResponseWriter> apply(Request request, Response response) =>
+      responseWritersForEntity(request, response)
         .flatMap((final Dictionary<MediaRange, ResponseWriter> writers) =>
             Preference.bestMatch(request.preferences.acceptedMediaRanges, writers.keys)
               .map((final MediaRange bestMediaRangeChoice) =>

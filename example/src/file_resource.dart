@@ -66,9 +66,10 @@ Future writeDirectory(final Request request, final Response<Directory> response,
             writeString(request, response.with_(entity:buffer.toString()), msgSink));    
   }
 
-Option<Dictionary<MediaRange, ResponseWriter>> responseWriters(final entity) {
+Option<Dictionary<MediaRange, ResponseWriter>> responseWriters(final Request request, final Response response) {
   MediaRange mediaRange;
   ResponseEntityWriter writer;
+  final entity = response.entity.value;
   
   if (entity is File) {
     mediaRange = mediaRangeForFile(entity);
@@ -76,8 +77,8 @@ Option<Dictionary<MediaRange, ResponseWriter>> responseWriters(final entity) {
   } else if (entity is Directory) {
     mediaRange = MediaRange.TEXT_HTML;
     writer = writeDirectory;
-  } else if (entity is Multipart) {
-    mediaRange = entity.type;
+  } else if (entity is MultipartOutput<ByteRange>) {
+    mediaRange = response.contentInfo.mediaRange.value;
     writer = writeMultipart;
   } else {
     mediaRange = MediaRange.TEXT_PLAIN;

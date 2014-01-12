@@ -138,7 +138,7 @@ class _ByteRangeResource<T>
               .with_(parameters: Persistent.EMPTY_SET_MULTIMAP.insert("boundary", boundary)))
           .without(length : true);
     
-    final Multipart<ByteRange> entity = Multipart.byteRange(boundary, parts);
+    final MultipartOutput entity = MultipartOutput.byteRange(parts);
     
     return response.with_(
         entity : entity,

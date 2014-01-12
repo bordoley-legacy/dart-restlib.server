@@ -13,6 +13,7 @@ import "package:restlib_parsing/parsing.dart";
 
 import "package:restlib_core/data.dart";
 import "package:restlib_core/http.dart";
+import "package:restlib_core/multipart.dart";
 
 part "src/server/application.dart";
 part "src/server/authorizer.dart";
