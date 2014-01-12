@@ -1,44 +1,6 @@
 part of restlib.server;
 
-class UniformResource<T> implements Resource<T> {
-  static ImmutableSet<Method> _getImplementedMethods(UniformResourceDelegate delegate) {
-    final MutableSet<Method> set = 
-        new MutableSet.hash(elements:
-            [Method.GET, Method.HEAD, 
-             Method.OPTIONS, Method.DELETE,
-             Method.PATCH, Method.POST, Method.PUT]);
-    
-    try {
-      delegate.delete(null);
-    } on NoSuchMethodError {
-      set.remove(Method.DELETE);
-    } catch (e) {
-    }
-    
-    try {
-      delegate.patch(null);
-    } on NoSuchMethodError {
-      set.remove(Method.PATCH);
-    } catch (e) {
-    }
-    
-    try {
-      delegate.post(null);
-    } on NoSuchMethodError {
-      set.remove(Method.POST);
-    } catch (e) {
-    }
-    
-    try {
-      delegate.put(null);
-    } on NoSuchMethodError {
-      set.remove(Method.PUT);
-    } catch (e) {
-    }
-    
-    return Persistent.EMPTY_SET.addAll(set);
-  }
-  
+class _UniformResource<T> implements Resource<T> {
   static bool _unmodified(final Request request, final Response response) {
     // Not a conditional request
     if (request.preconditions.ifNoneMatch.isEmpty && 
@@ -71,12 +33,7 @@ class UniformResource<T> implements Resource<T> {
   final Future<Response> _methodNotAllowedResponse;
   final Future<Response> _optionsResponse;
   
-  factory UniformResource(final UniformResourceDelegate<T> delegate) {
-    ImmutableSet<Method> allowedMethods = _getImplementedMethods(delegate);
-    return new UniformResource._internal(delegate, allowedMethods);
-  }
-  
-  UniformResource._internal(final UniformResourceDelegate<T> delegate, final ImmutableSet<Method> allowedMethods) :
+  _UniformResource._internal(final UniformResourceDelegate<T> delegate, final ImmutableSet<Method> allowedMethods) :
     _delegate = delegate,
     _allowedMethods = allowedMethods,
     _methodNotAllowedResponse = 
@@ -203,6 +160,44 @@ class UniformResource<T> implements Resource<T> {
 }
 
 abstract class UniformResourceDelegate<T> {
+  static ImmutableSet<Method> _getImplementedMethods(final UniformResourceDelegate delegate) {
+    final MutableSet<Method> set = 
+        new MutableSet.hash(elements:
+            [Method.GET, Method.HEAD, 
+             Method.OPTIONS, Method.DELETE,
+             Method.PATCH, Method.POST, Method.PUT]);
+    
+    try {
+      delegate.delete(null);
+    } on NoSuchMethodError {
+      set.remove(Method.DELETE);
+    } catch (e) {
+    }
+    
+    try {
+      delegate.patch(null);
+    } on NoSuchMethodError {
+      set.remove(Method.PATCH);
+    } catch (e) {
+    }
+    
+    try {
+      delegate.post(null);
+    } on NoSuchMethodError {
+      set.remove(Method.POST);
+    } catch (e) {
+    }
+    
+    try {
+      delegate.put(null);
+    } on NoSuchMethodError {
+      set.remove(Method.PUT);
+    } catch (e) {
+    }
+    
+    return Persistent.EMPTY_SET.addAll(set);
+  }
+  
   bool get requireETagForUpdate;
   
   bool get requireIfUnmodifiedSinceForUpdate;

@@ -92,7 +92,7 @@ Option<Dictionary<MediaRange, ResponseWriter>> responseWriters(final Request req
 
 IOResource ioFileResource(final Directory directory, final Uri path) {  
   final Resource<FileSystemEntity> resource = 
-      new UniformResource(new _FileResourceDelegate(directory, path));
+      new Resource.uniform(new _FileResourceDelegate(directory, path));
   
   final Resource<FileSystemEntity> rangeResource =
       new Resource.byteRangeResource(resource);

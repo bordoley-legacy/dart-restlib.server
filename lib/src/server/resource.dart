@@ -14,6 +14,11 @@ abstract class Resource<T> {
   factory Resource.byteRangeResource(delegate) =>
       new _ByteRangeResource(delegate);
   
+  factory Resource.uniform(final UniformResourceDelegate<T> delegate) {
+    final ImmutableSet<Method> allowedMethods = UniformResourceDelegate._getImplementedMethods(delegate);
+    return new _UniformResource._internal(delegate, allowedMethods);
+  }
+  
   Route get route;
 
   Future<Response> handle(Request request);
