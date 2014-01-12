@@ -9,7 +9,7 @@ abstract class ResponseWriter {
   factory ResponseWriter.forContentType(final MediaRange mediaRange, Future write(Request request, Response response, StreamSink<List<int>> msgSink)) =>
       new _ContentTypeResponseWriter(mediaRange, write);
   
-  factory ResponseWriter.toString(final MediaRange contentType) =>
+  factory ResponseWriter.string(final MediaRange contentType) =>
       new _ToStringResponseWriter(contentType);
   
   Response withContentInfo(Response response);
@@ -31,10 +31,10 @@ abstract class ResponseWriterProvider {
 
 class _ConnegResource<T> 
     extends Object
-    with ForwardingResource
+    with ForwardingResource<T>
     implements IOResource<T> { 
       
-  final Resource delegate;
+  final Resource<T> delegate;
   final RequestParserProvider requestParserProvider;
   final ResponseWriterProvider responseWriterProvider;
   

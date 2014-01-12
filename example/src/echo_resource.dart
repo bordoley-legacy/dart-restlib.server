@@ -5,13 +5,13 @@ IOResource ioAuthenticatedEchoResource(final Route route) =>
         new Resource.authorizingResource(
             new _EchoResource(route), [new _EchoAuthorizer()]),
         (_) => new Option(parseString), 
-        new ResponseWriterProvider.alwaysProvides(new ResponseWriter.toString(MediaRange.TEXT_PLAIN)));
+        new ResponseWriterProvider.alwaysProvides(new ResponseWriter.string(MediaRange.TEXT_PLAIN)));
 
 IOResource ioEchoResource(final Route route) =>
     new IOResource.conneg(
         new _EchoResource(route), 
         (_) => new Option(parseString), 
-        new ResponseWriterProvider.alwaysProvides(new ResponseWriter.toString(MediaRange.TEXT_PLAIN)));
+        new ResponseWriterProvider.alwaysProvides(new ResponseWriter.string(MediaRange.TEXT_PLAIN)));
 
 class _EchoResourceDelegate implements UniformResourceDelegate<String> {
   final bool requireETagForUpdate = false;
@@ -41,7 +41,7 @@ class _EchoResource
   final Resource<String> delegate;
   
   _EchoResource(final Route route):
-    delegate = new UniformResource(new _EchoResourceDelegate(route));
+    delegate = new Resource.uniform(new _EchoResourceDelegate(route));
 }
 
 class _EchoAuthorizer extends BasicAuthorizer {
