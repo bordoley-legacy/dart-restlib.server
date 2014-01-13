@@ -14,10 +14,23 @@ import "package:restlib_core/http.dart";
 import "package:restlib_core/multipart.dart";
 import "package:restlib_server/server.dart";
 
+part "src/io/application.dart";
 part "src/io/conneg_resource.dart";
 part "src/io/conneg_resource_impl.dart";
-part "src/io/io_application.dart";
 part "src/io/io_resource.dart";
+
+typedef Application ApplicationSupplier(Request);
+
+ApplicationSupplier virtualHostApplicationSupplier(Map<String,Application> applications, [Application fallback]) {
+  checkArgument(applications.isNotEmpty);
+
+  fallback = (fallback != null) ? fallback : applications.values.first;
+
+  return (Request request){
+    Application app = applications[request.uri.host];
+    return (app != null) ? app : fallback;
+  };
+}
 
 Future<Request<String>> parseString(final Request request, final Stream<List<int>> msgStream){
   final Charset charset = 
