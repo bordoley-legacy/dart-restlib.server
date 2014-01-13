@@ -1,19 +1,24 @@
 part of restlib.server;
 
 abstract class Authorizer {
+  factory Authorizer.basicAuth(String realm, Future<bool> authenticate(String username, String pwd)) =>
+      new _BasicAuthorizer(realm, authenticate);
+      
   ChallengeMessage get authenticationChallenge;
   String get scheme;
   
   Future<bool> authenticate(ChallengeMessage credentials) ;
 }
 
-abstract class BasicAuthorizer implements Authorizer {
+typedef Future<bool> _AuthenticateUserNamePwd(String username, String pwd);
+class _BasicAuthorizer implements Authorizer {
   static final Future<bool> falseFuture = new Future.value(false);
   
   final String scheme = "basic";
   final ChallengeMessage authenticationChallenge;
+  final _AuthenticateUserNamePwd authenticateUserAndPwd;
   
-  BasicAuthorizer(final String realm): 
+  _BasicAuthorizer(final String realm, this.authenticateUserAndPwd): 
     authenticationChallenge = 
       CHALLENGE_MESSAGE.parse("basic realm=\"$realm\", encoding=\"UTF-8\"").value;
   
@@ -33,6 +38,4 @@ abstract class BasicAuthorizer implements Authorizer {
       return falseFuture;
     }
   }
-
-  Future<bool> authenticateUserAndPwd(String user, String pwd);
 }
