@@ -55,51 +55,17 @@ Future writeString(final Request<String> request, final Response response, final
           new Future.error("${charset.toString()} is unsupported"));
 }
 
-Future writeMultipart(final Request request, final Response<Multipart<Streamable>> response, final StreamSink<List<int>> msgSink) {
-  final Multipart<Streamable> entity = response.entity.value;
-  final String boundary = response.contentInfo.mediaRange.value.parameters["boundary"].first;
-  
-  return entity
-    .fold(new Future.value(), (final Future future, final Part part) => 
-        future
-          .then((_) {
-            msgSink.add(ASCII.encode("--$boundary\r\n"));
-            msgSink.add(ASCII.encode(part.contentInfo.toString()));
-            return msgSink
-                .addStream(part.entity.asStream())
-                .then((_) =>
-                    msgSink.add(ASCII.encode("\r\n\r\n")));
-          }))
-   .then((_) =>
-       msgSink.add(ASCII.encode("--$boundary--\r\n")));   
-}
+Future writeMultipart(final Request request, final Response<ByteStreamableMultipart> response, final StreamSink<List<int>> msgSink) =>
+    msgSink.addStream(response.entity.value.asByteStream());
 
-
-
-
-typedef Future<Part> PartParser(ContentInfo contentInfo, final Stream<List<int>> msgStream);
-
-Future<Request<Multipart>> parseMultipartInput(final Request request, final Stream<List<int>> msgStream, Option<PartParser> partParserProvider(ContentInfo contentInfo)){
+Future<Request<Multipart>> parseMultipart(
+    final Request request, 
+    final Stream<List<int>> msgStream, 
+    Option<PartParser> partParserProvider(ContentInfo contentInfo)){
   final String boundary = request.contentInfo.mediaRange.value.parameters["boundary"].value;
   
-  return new MimeMultipartTransformer(boundary)
-    .bind(msgStream)
-    .map((final MimeMultipart multipart) => 
-        new Part(new ContentInfo.wrapHeaders(
-            (final Header header) => 
-                new Option(multipart.headers[header.toString()])), 
-            multipart))
-    .fold(Persistent.EMPTY_SEQUENCE, (final ImmutableSequence<Future> futureResults, final Part<Stream<List<int>>> part) => 
-        partParserProvider(part.contentInfo)
-          .map((final PartParser parser) =>
-              futureResults.add(parser(part.contentInfo, part.entity)))
-          .orCompute(() =>
-              futureResults.add(part.entity.drain()))
-     .then(Future.wait)
-     .then((final List parts) => 
-         parts.where((final e) =>
-             e is Part))
-     .then((final List<Part> parts) =>
-         request.with_(entity: new Multipart(parts))));              
+  return parseMultipartStream(msgStream, boundary, partParserProvider)
+      .then((final Multipart multipart) =>
+          request.with_(entity: multipart));          
 }
 
