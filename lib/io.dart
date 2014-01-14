@@ -55,8 +55,8 @@ Future writeString(final Request<String> request, final Response response, final
           new Future.error("${charset.toString()} is unsupported"));
 }
 
-Future writeMultipart(final Request request, final Response<MultipartOutput> response, final StreamSink<List<int>> msgSink) {
-  final MultipartOutput entity = response.entity.value;
+Future writeMultipart(final Request request, final Response<Multipart<Streamable>> response, final StreamSink<List<int>> msgSink) {
+  final Multipart<Streamable> entity = response.entity.value;
   final String boundary = response.contentInfo.mediaRange.value.parameters["boundary"].first;
   
   return entity
@@ -75,6 +75,8 @@ Future writeMultipart(final Request request, final Response<MultipartOutput> res
 }
 
 
+
+
 typedef Future<Part> PartParser(ContentInfo contentInfo, final Stream<List<int>> msgStream);
 
 Future<Request<Multipart>> parseMultipartInput(final Request request, final Stream<List<int>> msgStream, Option<PartParser> partParserProvider(ContentInfo contentInfo)){
@@ -83,7 +85,10 @@ Future<Request<Multipart>> parseMultipartInput(final Request request, final Stre
   return new MimeMultipartTransformer(boundary)
     .bind(msgStream)
     .map((final MimeMultipart multipart) => 
-        new Part(new ContentInfo.wrapHeaders(new Dictionary.wrapMap(multipart.headers)), multipart))
+        new Part(new ContentInfo.wrapHeaders(
+            (final Header header) => 
+                new Option(multipart.headers[header.toString()])), 
+            multipart))
     .fold(Persistent.EMPTY_SEQUENCE, (final ImmutableSequence<Future> futureResults, final Part<Stream<List<int>>> part) => 
         partParserProvider(part.contentInfo)
           .map((final PartParser parser) =>
