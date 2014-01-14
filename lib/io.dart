@@ -2,9 +2,9 @@ library restlib.server.io;
 
 import "dart:async";
 import "dart:convert";
-import "package:mime/mime.dart";
 
 import "package:restlib_common/collections.dart";
+import "package:restlib_common/io.dart";
 import "package:restlib_common/objects.dart";
 
 import "package:restlib_core/data.dart";
