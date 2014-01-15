@@ -25,7 +25,7 @@ class _ByteRangeResource<T>
     }
     
     final entity = response.entity.value;
-    if (entity is! ByteRange) {
+    if (entity is! ByteRangeable) {
       return new Future.value(response);
     }
   
@@ -37,10 +37,10 @@ class _ByteRangeResource<T>
     }  
   }
   
-  Future<Response> _byteRangeResponse(final Request request, final Response response) {
+  Future<Response> _byteRangeResponse(final Request request, final Response<ByteRangeable> response) {
     final ImmutableSequence<Either<ByteRangeSpec, SuffixByteRangeSpec>> ranges = 
         (request.preferences.range.value as ByteRangesSpecifier).byteRangeSet;
-    final ByteRange entity = response.entity.value;
+    final ByteRangeable entity = response.entity.value;
     
     // Only lookup the length of the entity of the Response does not include it to avoid duplicate work
     return response.contentInfo.length
@@ -85,10 +85,10 @@ class _ByteRangeResource<T>
         range: new ContentRange.byteRange(firstBytePos, lastBytePos, entityLength));
   }
   
-  Response _multiByteRangeRequest(final Response<ByteRange> response, 
+  Response _multiByteRangeRequest(final Response<ByteRangeable> response, 
                                   final ImmutableSequence<Either<ByteRangeSpec, SuffixByteRangeSpec>> ranges,
                                   final int entityLength) {
-    final ImmutableSequence<Part<ByteRange>> parts =
+    final ImmutableSequence<Part<ByteStreamable>> parts =
         Persistent.EMPTY_SEQUENCE.addAll(
             ranges
               .map((final Either<ByteRangeSpec, SuffixByteRangeSpec> range) =>
@@ -96,11 +96,11 @@ class _ByteRangeResource<T>
               .where((final ContentInfo contentInfo) =>
                   contentInfo.range.nullableValue is! UnsatisfiedRange)
                   
-    // FIXME: Add in the ability here to defin rules for how to process the parsed ranges and whether 
+    // FIXME: Add in the ability here to define rules for how to process the parsed ranges and whether 
     // they should be merged. Ideally this would be a policy object passed to the class at construction time.
               .map((final ContentInfo contentInfo) => 
                   new Part(contentInfo, 
-                      response.entity.value.subRange(
+                      new ByteStreamable.byteRange(response.entity.value,
                           (contentInfo.range.value as BytesContentRange).rangeResp.left.value.firstBytePosition,
                           (contentInfo.range.value as BytesContentRange).rangeResp.left.value.lastBytePosition))));
     
