@@ -167,34 +167,22 @@ abstract class UniformResourceDelegate<T> {
              Method.OPTIONS, Method.DELETE,
              Method.PATCH, Method.POST, Method.PUT]);
     
-    try {
-      delegate.delete(null);
-    } on NoSuchMethodError {
-      set.remove(Method.DELETE);
-    } catch (e) {
+    void testMethod(final Method methodName, method) {
+      try {
+        method(null);
+      } on NoSuchMethodError {
+        set.remove(methodName);
+      } on UnimplementedError {
+        set.remove(methodName);
+      } catch (e) {
+      }
     }
     
-    try {
-      delegate.patch(null);
-    } on NoSuchMethodError {
-      set.remove(Method.PATCH);
-    } catch (e) {
-    }
-    
-    try {
-      delegate.post(null);
-    } on NoSuchMethodError {
-      set.remove(Method.POST);
-    } catch (e) {
-    }
-    
-    try {
-      delegate.put(null);
-    } on NoSuchMethodError {
-      set.remove(Method.PUT);
-    } catch (e) {
-    }
-    
+    testMethod(Method.DELETE, delegate.delete);
+    testMethod(Method.PATCH, delegate.patch);
+    testMethod(Method.POST, delegate.post);
+    testMethod(Method.PUT, delegate.put);
+
     return Persistent.EMPTY_SET.addAll(set);
   }
   
