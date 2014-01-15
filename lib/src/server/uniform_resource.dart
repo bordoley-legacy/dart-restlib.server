@@ -170,8 +170,6 @@ abstract class UniformResourceDelegate<T> {
     void testMethod(final Method methodName, method) {
       try {
         method(null);
-      } on NoSuchMethodError {
-        set.remove(methodName);
       } on UnimplementedError {
         set.remove(methodName);
       } catch (e) {
@@ -179,6 +177,8 @@ abstract class UniformResourceDelegate<T> {
     }
     
     testMethod(Method.DELETE, delegate.delete);
+    testMethod(Method.GET, delegate.get);
+    testMethod(Method.HEAD, delegate.get);
     testMethod(Method.PATCH, delegate.patch);
     testMethod(Method.POST, delegate.post);
     testMethod(Method.PUT, delegate.put);
@@ -192,14 +192,19 @@ abstract class UniformResourceDelegate<T> {
   
   Route get route;
   
-  Future<Response> delete(Request request);
+  Future<Response> delete(Request request) =>
+      throw new UnimplementedError();
   
-  Future<Response> get(Request request);
+  Future<Response> get(Request request) =>
+      throw new UnimplementedError();
   
-  Future<Response> patch(Request<T> request);
+  Future<Response> patch(Request<T> request) =>
+      throw new UnimplementedError();
   
-  Future<Response> post(Request<T> request);
+  Future<Response> post(Request<T> request) =>
+      throw new UnimplementedError();
   
-  Future<Response> put(Request<T> request);
+  Future<Response> put(Request<T> request) =>
+      throw new UnimplementedError();
 }
 
