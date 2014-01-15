@@ -1,6 +1,5 @@
 part of restlib.server;
 
-@proxy
 class RoutableUri extends NoSuchMethodForwarder implements Uri {
   static RoutableUri parse(String uri) {
     return new RoutableUri.wrap(Uri.parse(uri));
@@ -30,6 +29,9 @@ class RoutableUri extends NoSuchMethodForwarder implements Uri {
   
   bool operator==(other) =>
       delegate == other;
+  
+  dynamic noSuchMethod(Invocation invocation) =>
+      super.noSuchMethod(invocation);
 }
 
 class _Path {
