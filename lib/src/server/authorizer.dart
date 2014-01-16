@@ -7,7 +7,7 @@ abstract class Authorizer {
   ChallengeMessage get authenticationChallenge;
   String get scheme;
   
-  Future<bool> authenticate(ChallengeMessage credentials) ;
+  Future<bool> authenticate(Request request) ;
 }
 
 typedef Future<bool> _AuthenticateUserNamePwd(String username, String pwd);
@@ -22,8 +22,10 @@ class _BasicAuthorizer implements Authorizer {
     authenticationChallenge = 
       CHALLENGE_MESSAGE.parse("basic realm=\"$realm\", encoding=\"UTF-8\"").value;
   
-  Future<bool> authenticate(final ChallengeMessage credentials) {
-    if(credentials is Base64ChallengeMessage) {
+  Future<bool> authenticate(final Request request) {
+    final ChallengeMessage credentials = request.authorizationCredentials.value;
+    
+    if (credentials is Base64ChallengeMessage) {
       final String userPwd = UTF8.decode(CryptoUtils.base64StringToBytes(credentials.data));
       
       final int splitCharIndex = userPwd.indexOf(":");
