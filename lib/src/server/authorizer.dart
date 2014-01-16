@@ -10,6 +10,17 @@ abstract class Authorizer {
   Future<bool> authenticate(Request request) ;
 }
 
+abstract class ForwardingAuthorizer implements Forwarder {
+  ChallengeMessage get authenticationChallenge =>
+      delegate.authenticationChallenge;
+  
+  String get scheme =>
+      delegate.scheme;
+  
+  Future<bool> authenticate(Request request) =>
+      delegate.authenticate(request);
+}
+
 typedef Future<bool> _AuthenticateUserNamePwd(String username, String pwd);
 class _BasicAuthorizer implements Authorizer {
   static final Future<bool> falseFuture = new Future.value(false);
