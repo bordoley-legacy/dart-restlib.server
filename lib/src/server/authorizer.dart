@@ -10,7 +10,7 @@ abstract class Authorizer {
   Future<bool> authenticate(Request request) ;
 }
 
-abstract class ForwardingAuthorizer implements Forwarder {
+abstract class ForwardingAuthorizer implements Authorizer, Forwarder {
   ChallengeMessage get authenticationChallenge =>
       delegate.authenticationChallenge;
   
