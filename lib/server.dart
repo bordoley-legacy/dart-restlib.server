@@ -7,6 +7,8 @@ import "dart:math";
 import "package:crypto/crypto.dart";
 
 import "package:restlib_common/collections.dart";
+import "package:restlib_common/collections.immutable.dart";
+import "package:restlib_common/collections.mutable.dart";
 import "package:restlib_common/io.dart";
 import "package:restlib_common/objects.dart";
 import "package:restlib_parsing/parsing.dart";

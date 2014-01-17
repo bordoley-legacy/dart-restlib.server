@@ -5,6 +5,7 @@ import "package:unittest/mock.dart";
 import "package:unittest/unittest.dart";
 
 import "package:restlib_common/collections.dart";
+import "package:restlib_common/collections.immutable.dart";
 
 import "package:restlib_core/data.dart";
 import "package:restlib_core/http.dart";
