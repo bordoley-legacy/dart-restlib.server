@@ -1,8 +1,14 @@
 part of restlib.server.io;
 
 abstract class Application {
-  factory Application(final Iterable<IOResource> resources, [final IOResource defaultResource = IOResource.NOT_FOUND]) =>
-      new _ApplicationImpl(resources, defaultResource);
+  factory Application(
+      final Iterable<IOResource> resources, 
+      {final IOResource defaultResource : IOResource.NOT_FOUND,
+       Request requestFilter(Request request) : identity,
+       Response responseFilter(Response response) : identity}) =>
+      new _ApplicationImpl(
+          Persistent.EMPTY_SEQUENCE.addAll(resources), defaultResource,
+          requestFilter, responseFilter);
   
   Request filterRequest(final Request request);
   Response filterResponse(final Response response);
@@ -24,19 +30,21 @@ abstract class ForwardingApplication implements Forwarder, Application {
       delegate.writeError(request, response, msgSink);
 }
 
+typedef Request _RequestFilter(Request request);
+typedef Response _ResponseFilter(Response response);
 class _ApplicationImpl implements Application {  
   final IOResource _defaultResource;
   final ImmutableSequence<IOResource> _resources;
+  final _RequestFilter requestFilter;
+  final _ResponseFilter responseFilter;
   
-  _ApplicationImpl(final Iterable<IOResource> resources, final IOResource defaultResource):
-    _resources = Persistent.EMPTY_SEQUENCE.addAll(resources),
-    _defaultResource = (defaultResource == null) ? resources.first : defaultResource;
+  _ApplicationImpl(this._resources, this._defaultResource, this.requestFilter, this.responseFilter);
   
   Request filterRequest(final Request request) => 
-      request;
+      requestFilter(request);
   
   Response filterResponse(final Response response) => 
-      response;
+      responseFilter(response);
   
   IOResource route(final Request request) =>
       _resources.firstWhere((final IOResource resource) => 
