@@ -24,7 +24,7 @@ authorizedResourceTests() {
               CHALLENGE_MESSAGE.parse("basic realm=\"test\", encoding=\"UTF-8\""))]); 
   
   test("Request missing Authorization header", () {
-    Request request = new RequestBuilder().build();
+    Request request = new Request(Method.GET, Uri.parse("http://www.example.com"));
     Future<Response> authResponse = mockAuthenticateTrueResource.handle(request);
     authResponse.then((Response response){
       expect(response.status, equals(Status.CLIENT_ERROR_UNAUTHORIZED));
@@ -34,9 +34,10 @@ authorizedResourceTests() {
   
   test("Request authorization credentials with unsupported scheme", () {
     Request request = 
-        (new RequestBuilder()
-          ..authorizationCredentials = CHALLENGE_MESSAGE.parse("INVALID ABCD==").value
-        ).build();
+        new Request(
+            Method.GET, 
+            Uri.parse("http://www.example.com"),
+            authorizationCredentials : CHALLENGE_MESSAGE.parse("INVALID ABCD==").value);
     Future<Response> authResponse = mockAuthenticateTrueResource.handle(request);
     authResponse.then((Response response){
       expect(response.status, equals(Status.CLIENT_ERROR_UNAUTHORIZED));
@@ -46,9 +47,10 @@ authorizedResourceTests() {
   
   test("Request authorization with valid credentials", (){
     Request request = 
-        (new RequestBuilder()
-          ..authorizationCredentials = CHALLENGE_MESSAGE.parse("basic abcd==").value
-        ).build();
+        new Request(
+            Method.GET, 
+            Uri.parse("http://www.example.com"),
+            authorizationCredentials : CHALLENGE_MESSAGE.parse("basic abcd==").value);
     Future<Response> authResponse = mockAuthenticateTrueResource.handle(request);
     authResponse.then((Response response){
       expect(response.status, equals(Status.SUCCESS_OK));
@@ -58,9 +60,10 @@ authorizedResourceTests() {
   
   test("Request authorization with invalid credentials", (){
     Request request = 
-        (new RequestBuilder()
-          ..authorizationCredentials = CHALLENGE_MESSAGE.parse("basic abcd==").value
-        ).build();
+        new Request(
+            Method.GET, 
+            Uri.parse("http://www.example.com"),
+            authorizationCredentials : CHALLENGE_MESSAGE.parse("basic abcd==").value);
     Future<Response> authResponse = mockAuthenticateFalseResource.handle(request);
     authResponse.then((Response response){
       expect(response.status, equals(Status.CLIENT_ERROR_FORBIDDEN));

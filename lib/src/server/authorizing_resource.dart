@@ -9,13 +9,11 @@ class _AuthorizingResource<T> extends Object with ForwardingResource<T> {
     this._authorizerMap = authorizerMap,
     this._unauthorizedResponse =  
       new Future.value(
-        (new ResponseBuilder()
-        ..entity = Status.CLIENT_ERROR_UNAUTHORIZED.reason
-        ..status = Status.CLIENT_ERROR_UNAUTHORIZED
-        ..addAuthenticationChallenges(
-            authorizerMap.map((final Pair<String, Authorizer> pair) =>
-                pair.snd.authenticationChallenge))
-        ).build());
+        new Response(
+            Status.CLIENT_ERROR_UNAUTHORIZED, 
+            entity : Status.CLIENT_ERROR_UNAUTHORIZED.reason,
+            authenticationChallenges : authorizerMap.map((final Pair<String, Authorizer> pair) =>
+                pair.snd.authenticationChallenge)));
   
   Future<Response> handle(final Request request) =>
       request.authorizationCredentials

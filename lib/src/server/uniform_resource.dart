@@ -38,17 +38,16 @@ class _UniformResource<T> implements Resource<T> {
     _allowedMethods = allowedMethods,
     _methodNotAllowedResponse = 
       new Future.value(
-           (new ResponseBuilder()
-            ..status = Status.CLIENT_ERROR_METHOD_NOT_ALLOWED
-            ..addAllowedMethods(allowedMethods)
-           ).build()),
+           new Response(
+            Status.CLIENT_ERROR_METHOD_NOT_ALLOWED,
+            allowedMethods : allowedMethods)),
    _optionsResponse = 
      new Future.value(
-          (new ResponseBuilder()
-            ..status = Status.SUCCESS_OK
-            ..addAllowedMethods(allowedMethods)
-            ..entity = Status.SUCCESS_OK.message
-          ).build());
+         new Response(
+            Status.SUCCESS_OK,
+            allowedMethods : allowedMethods,
+            entity : Status.SUCCESS_OK.message
+          ));
   
   Route get route {
     return _delegate.route;

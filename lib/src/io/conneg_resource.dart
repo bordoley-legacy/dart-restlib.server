@@ -43,11 +43,10 @@ class _ConnegResource<T>
   _ConnegResource(this.delegate, this.requestParserProvider, final ResponseWriterProvider responseWriterProvider) :
     this.responseWriterProvider = responseWriterProvider,
     this.notAcceptableResponse = 
-      (new ResponseBuilder()
-        ..entity = Status.CLIENT_ERROR_NOT_ACCEPTABLE.reason
-        ..status = Status.CLIENT_ERROR_NOT_ACCEPTABLE
-        ..addVaryHeaders(responseWriterProvider.variesOn)
-      ).build();
+      new Response(
+          Status.CLIENT_ERROR_NOT_ACCEPTABLE,
+          entity : Status.CLIENT_ERROR_NOT_ACCEPTABLE.reason,
+          vary : responseWriterProvider.variesOn);
   
 Response addContentInfoToResponse(final Request request, final Response response) =>
     response.entity
