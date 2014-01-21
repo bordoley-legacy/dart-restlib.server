@@ -21,6 +21,8 @@ abstract class Resource<T> {
   
   Route get route;
 
+  Request filterRequest(final Request request);
+  Response filterResponse(final Response response);
   Future<Response> handle(Request request);
   Future<Response> acceptMessage(Request<T> request);
 }
@@ -30,13 +32,29 @@ class _NotFoundResource implements Resource {
   
   Route get route => null;
   
-  Future<Response> handle(Request request) => CLIENT_ERROR_NOT_FOUND;
-  Future<Response> acceptMessage(Request request) => CLIENT_ERROR_NOT_FOUND;
+  Request filterRequest(final Request request) =>
+      request;
+  
+  Response filterResponse(final Response response) =>
+      response;
+  
+  Future<Response> handle(Request request) => 
+      CLIENT_ERROR_NOT_FOUND;
+  
+  Future<Response> acceptMessage(Request request) => 
+      CLIENT_ERROR_NOT_FOUND;
 }
 
 abstract class ForwardingResource<T> implements Forwarder, Resource<T> {    
   Route get route => delegate.route;
 
+  Request filterRequest(final Request request) =>
+      delegate.filterRequest(request);
+  
+  Response filterResponse(final Response response) =>
+      delegate.filterResponse(response);
+  
   Future<Response> handle(final Request request) => delegate.handle(request);
+  
   Future<Response> acceptMessage(final Request<T> request) => delegate.acceptMessage(request);
 }

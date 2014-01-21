@@ -123,6 +123,12 @@ class _UniformResource<T> implements Resource<T> {
         });
   }
   
+  Request filterRequest(final Request request) =>
+      request;
+  
+  Response filterResponse(final Response response) =>
+      response;
+  
   Future<Response<T>> handle(final Request request) {
     
     // Check if the method is supported by this resource

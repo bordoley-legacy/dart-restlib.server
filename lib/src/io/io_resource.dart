@@ -27,6 +27,12 @@ class _NotFoundIOResource implements IOResource {
   Route get route => 
       Resource.NOT_FOUND.route;
   
+  Request filterRequest(final Request request) =>
+      request;
+  
+  Response filterResponse(final Response response) =>
+      response;
+  
   Future<Response> handle(final Request request) => 
       Resource.NOT_FOUND.handle(request);
   
