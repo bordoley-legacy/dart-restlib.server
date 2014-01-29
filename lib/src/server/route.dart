@@ -85,7 +85,7 @@ class Route {
   
   const Route._internal(this._segments);
   
-  bool matches(Uri uri) {
+  bool matches(URI uri) {
     try {
       parsePathParameters(uri);
       return true;
@@ -94,15 +94,15 @@ class Route {
     }
   }
   
-  Dictionary<String, String> parsePathParameters(RoutableUri uri) {    
+  Dictionary<String, String> parsePathParameters(URI uri) {    
     Map<String, String> retval = new Map();
 
-    ImmutableSequence uriSegments = uri._pathSegments.canonicalize().segments;
+    Path path = uri.path.canonicalize();
     
     int i = 0, j = 0;
-    for (; i < _segments.length && j < uriSegments.length; i++, j++) {
+    for (; i < _segments.length && j < path.length; i++, j++) {
       _RouteSegment routeSegment = _segments.elementAt(i);
-      String pathSegment = uriSegments.elementAt(j);
+      String pathSegment = path.elementAt(j);
       
       if (routeSegment is _GlobSegment) {
         String key = routeSegment.name;
@@ -110,9 +110,9 @@ class Route {
         String stopSegment = (i+1 < _segments.length) ? _segments.elementAt(i+1).name : "";
         StringBuffer buffer = new StringBuffer("$pathSegment");
         
-        for(j++; j < uriSegments.length; j++) {
-          if (uriSegments.elementAt(j) != stopSegment) {
-            buffer.write("/${uriSegments.elementAt(j)}");
+        for(j++; j < path.length; j++) {
+          if (path.elementAt(j) != stopSegment) {
+            buffer.write("/${path.elementAt(j)}");
           } else {
             j--;
             break;
@@ -130,7 +130,7 @@ class Route {
       }  
     }
     
-    if (i < _segments.length || j < uriSegments.length) {
+    if (i < _segments.length || j < path.length) {
       throw new ArgumentError("$uri does not match route $this");
     }
     

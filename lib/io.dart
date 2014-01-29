@@ -11,6 +11,7 @@ import "package:restlib_common/objects.dart";
 import "package:restlib_core/data.dart";
 import "package:restlib_core/http.dart";
 import "package:restlib_core/multipart.dart";
+import "package:restlib_core/net.dart";
 import "package:restlib_server/server.dart";
 
 part "src/io/application.dart";
@@ -20,9 +21,9 @@ part "src/io/io_resource.dart";
 
 typedef Application ApplicationSupplier(Request);
 
-ApplicationSupplier virtualHostApplicationSupplier(Option<Application> applicationForHost(String host), final Application fallback) =>
+ApplicationSupplier virtualHostApplicationSupplier(Option<Application> applicationForHost(Either<DomainName, IPAddress> host), final Application fallback) =>
     (final Request request) =>
-        applicationForHost(request.uri.host)
+        applicationForHost(request.uri.authority.value.host)
           .orElse(fallback);
 
 Future<Request<String>> parseString(final Request request, final Stream<List<int>> msgStream){

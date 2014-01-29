@@ -48,7 +48,7 @@ class _ApplicationImpl implements Application {
   
   IOResource route(final Request request) =>
       _resources.firstWhere((final IOResource resource) => 
-          resource.route.matches(new RoutableUri.wrap(request.uri)),
+          resource.route.matches(request.uri),
         orElse: () => 
             _defaultResource);
   
