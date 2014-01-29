@@ -134,7 +134,7 @@ class Route {
       throw new ArgumentError("$uri does not match route $this");
     }
     
-    return Persistent.EMPTY_DICTIONARY.insertAllFromMap(retval);
+    return Persistent.EMPTY_DICTIONARY.putAllFromMap(retval);
   }
   
   String toString() => _segments.join("/");

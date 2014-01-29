@@ -31,13 +31,13 @@ routeTests() {
   }
   
   doParsePathParameters("/a/:b/*c/:g/:h/i", "/a/b/c/d/e/f/g/h/i", 
-                        Persistent.EMPTY_DICTIONARY.insertAllFromMap({"b" : "b", "c" : "c/d/e/f", "g" : "g", "h" : "h"}));
+                        Persistent.EMPTY_DICTIONARY.putAllFromMap({"b" : "b", "c" : "c/d/e/f", "g" : "g", "h" : "h"}));
   doParsePathParameters("/a/:b/c/:d", "/a/b/c/d",
-                        Persistent.EMPTY_DICTIONARY.insertAllFromMap({"b" : "b", "d" : "d"}));
+                        Persistent.EMPTY_DICTIONARY.putAllFromMap({"b" : "b", "d" : "d"}));
   doParsePathParameters("/a/:b/c/:d/", "/a/b/c/d/",
-                        Persistent.EMPTY_DICTIONARY.insertAllFromMap({"b" : "b", "d" : "d"}));
+                        Persistent.EMPTY_DICTIONARY.putAllFromMap({"b" : "b", "d" : "d"}));
   doParsePathParameters("/a/*b", "/a/b/c/d/e/f/g/h/i",
-                        Persistent.EMPTY_DICTIONARY.insertAllFromMap({"b" : "b/c/d/e/f/g/h/i"}));
+                        Persistent.EMPTY_DICTIONARY.putAllFromMap({"b" : "b/c/d/e/f/g/h/i"}));
   
   doTestMatches("/a/:b/*c/:g/:h/i", "/a/b/c/d/e/f/g/h/i", true);
   doTestMatches("/a/:b/c/:d", "/a/b/c/d", true);
