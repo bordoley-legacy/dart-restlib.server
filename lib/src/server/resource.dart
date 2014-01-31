@@ -19,6 +19,14 @@ abstract class Resource<T> {
     return new _UniformResource._internal(delegate, allowedMethods);
   }
   
+  factory Resource.proxyAuthorizingResource(final Resource<T> delegate, final Iterable<Authorizer> authorizer) {
+    final ImmutableDictionary<String, Authorizer> authorizerMap = 
+        Persistent.EMPTY_DICTIONARY.putAll(authorizer.map((final Authorizer authorizer) =>
+            new Pair(authorizer.scheme, authorizer)));
+    
+    return new _ProxyAuthorizingResource<T> (delegate, authorizerMap);
+  }
+  
   Route get route;
 
   Request filterRequest(final Request request);
