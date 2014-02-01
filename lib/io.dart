@@ -71,3 +71,11 @@ Future<Request<Multipart>> parseMultipart(
           request.with_(entity: multipart));          
 }
 
+Future<Request<Form>> parseForm(final Request request, final Stream<List<int>> msgStream) =>
+    parseString(request, msgStream)
+      .then((final Request<String> request) =>
+          FORM.parse(request.entity.value)
+            .map((final Form form) =>
+                request.with_(entity: form))
+            .orCompute(() => 
+                new Future.error("unable to parse form encoded data")));
