@@ -13,55 +13,52 @@ class Router {
     }
   }
   
-  final Option<IOResource> _value;
+  final Option<IOResource> _resource;
   final ImmutableDictionary<String, Router> _children;
   
-  const Router._internal(this._value, this._children);
+  const Router._internal(this._resource, this._children);
 
   int get hashCode =>
-      computeHashCode([_value, _children]);
+      computeHashCode([_resource, _children]);
   
   bool operator==(other) {
     if (identical(this, other)) {
       return true;
     } else if (other is Router) {
-      return this._value == other._value &&
+      return this._resource == other._resource &&
           this._children == other._children;
     }
   }
   
   Option<IOResource> operator[](final Sequence<String> path) {
     if (path.isEmpty) {
-      return _value;
+      return _resource;
     } else {
       Sequence<String> tail = path.subSequence(1, path.length - 1);
-      
-      Option<Router> nextRouter = _children[path.first];
-      if (nextRouter.isNotEmpty) {
-        for(final IOResource resource in nextRouter.value[tail]) {
+
+      for(final Router nextRouter in _children[path.first]) {
+        for(final IOResource resource in nextRouter[tail]) {
           return new Option(resource);
         }       
       }
       
-      nextRouter = _children[":"];
-      if (nextRouter.isNotEmpty) {
-        for (final IOResource resource in nextRouter.value[tail]) {
+      for(final Router nextRouter in _children[":"]) {
+        for (final IOResource resource in nextRouter[tail]) {
           return new Option(resource);
         }
       }
       
-      nextRouter = _children["*"];
-      if (nextRouter.isNotEmpty) { 
+      for(final Router nextRouter in _children["*"]) {
         while(tail.length > 0) {
           final Sequence<String> newTail = tail.subSequence(1, tail.length - 1); 
           
-          if (nextRouter.value._children.containsKey(tail.first)) {
-            return nextRouter.value._children[tail.first].value[newTail];
+          for(final Router childRouter in nextRouter._children[tail.first]){
+            return childRouter[newTail];
           }
 
           tail = newTail;
         }
-        return this._value;
+        return nextRouter._resource;
       }
       
       return Option.NONE;
@@ -92,7 +89,7 @@ class Router {
           next._doPut(tail, resource))
         .orCompute(() =>
             Router.EMPTY._doPut(tail, resource));
-      return new Router._internal(this._value, _children.put(key, newChild));
+      return new Router._internal(this._resource, _children.put(key, newChild));
     }
   }
   
