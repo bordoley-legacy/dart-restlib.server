@@ -66,7 +66,7 @@ Future<Request<Multipart>> parseMultipart(
     final Request request, 
     final Stream<List<int>> msgStream, 
     Option<PartParser> partParserProvider(ContentInfo contentInfo)){
-  final String boundary = request.contentInfo.mediaRange.value.parameters["boundary"].value;
+  final String boundary = request.contentInfo.mediaRange.value.parameters["boundary"]._value;
   
   return parseMultipartStream(msgStream, boundary, partParserProvider)
       .then((final Multipart multipart) =>
