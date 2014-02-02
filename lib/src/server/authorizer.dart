@@ -31,7 +31,7 @@ class _BasicAuthorizer implements Authorizer {
   
   _BasicAuthorizer(final String realm, this.authenticateUserAndPwd): 
     authenticationChallenge = 
-      CHALLENGE_MESSAGE.parse("basic realm=\"$realm\", encoding=\"UTF-8\"").value;
+      CHALLENGE_MESSAGE.parseValue("basic realm=\"$realm\", encoding=\"UTF-8\"");
   
   Future<bool> authenticate(final Request request) {
     final ChallengeMessage credentials = request.authorizationCredentials.value;
