@@ -4,9 +4,7 @@ class Router {
   static const Router EMPTY = const Router._internal(Option.NONE, Persistent.EMPTY_DICTIONARY);
   
   static String _routeSegmentToKey(final String segment) {
-    if (segment.startsWith("*")) {
-      return "*";
-    } else if (segment.startsWith(":")) {
+    if (segment.startsWith(":")) {
       return ":";
     } else {
       return segment;
@@ -51,7 +49,7 @@ class Router {
         }
       }
       
-      for(final Router nextRouter in _children["*"]) {
+      for(final Router nextRouter in concat(_children["*${path.first}"], _children["*"])) {
         while(tail.length > 0) {
           final Sequence<String> newTail = tail.subSequence(1, tail.length - 1); 
           
@@ -62,7 +60,7 @@ class Router {
           tail = newTail;
         }
         return nextRouter._resource;
-      }
+      }      
       
       return Option.NONE;
     }
