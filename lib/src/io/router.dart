@@ -37,16 +37,10 @@ class Router {
     } else {
       Sequence<String> tail = path.subSequence(1, path.length - 1);
 
-      for(final Router nextRouter in _children[path.first]) {
+      for(final Router nextRouter in concat(_children[path.first], _children[":"])) {
         for(final IOResource resource in nextRouter._doPathLookup(tail)) {
           return new Option(resource);
         }       
-      }
-      
-      for(final Router nextRouter in _children[":"]) {
-        for (final IOResource resource in nextRouter._doPathLookup(tail)) {
-          return new Option(resource);
-        }
       }
       
       for(final Router nextRouter in concat(_children["*${path.first}"], _children["*"])) {
