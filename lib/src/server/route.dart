@@ -12,6 +12,10 @@ final Parser<String> _PARAMETER_SEGMENT =
 
 final Parser<Route> ROUTE = 
   (PCHAR.orElse("") | _GLOB_SEGMENT | _PARAMETER_SEGMENT).sepBy(FORWARD_SLASH).map((final Iterable<String> e) {    
+    if (e.length == 1 && e.first.isEmpty) {
+      return Route.EMPTY;
+    }
+    
     final MutableSet<String> keys = new MutableSet.hash();
     Option<String> previous = Option.NONE;
     
@@ -50,7 +54,6 @@ abstract class Route implements ImmutableSequence<String> {
   
   Route add(String value);
   Route addAll(Iterable<String> elements);
-  bool matches(final URI uri);
   ImmutableDictionary<String, String> parsePathParameters(URI uri);
   Route push(String value);
   Route put(int key, String value);
@@ -82,15 +85,6 @@ class _Route
         // FIXME: validate segment
         return segment;
       })));
-  
-  bool matches(final URI uri) {
-    try {
-      parsePathParameters(uri);
-      return true;
-    } on ArgumentError {
-      return false;
-    }
-  }
   
   ImmutableDictionary<String, dynamic> parsePathParameters(final URI uri) {  
     ImmutableDictionary<String, dynamic> retval = Persistent.EMPTY_DICTIONARY;

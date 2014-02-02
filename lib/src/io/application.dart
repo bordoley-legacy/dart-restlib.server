@@ -2,12 +2,12 @@ part of restlib.server.io;
 
 abstract class Application {
   factory Application(
-      final Iterable<IOResource> resources, 
+      Option<IOResource> resourceForPath(final Sequence<String> path),
       {final IOResource defaultResource : IOResource.NOT_FOUND,
        Request requestFilter(Request request) : identity,
        Response responseFilter(Response response) : identity}) =>
       new _ApplicationImpl(
-          Persistent.EMPTY_SEQUENCE.addAll(resources), defaultResource,
+          resourceForPath, defaultResource,
           requestFilter, responseFilter);
   
   Request filterRequest(final Request request);
@@ -32,13 +32,14 @@ abstract class ForwardingApplication implements Forwarder, Application {
 
 typedef Request _RequestFilter(Request request);
 typedef Response _ResponseFilter(Response response);
+typedef Option<IOResource> _ResourceForPath(final Sequence<String> path);
 class _ApplicationImpl implements Application {  
   final IOResource _defaultResource;
-  final ImmutableSequence<IOResource> _resources;
+  final _ResourceForPath _resourceForPath;
   final _RequestFilter requestFilter;
   final _ResponseFilter responseFilter;
   
-  _ApplicationImpl(this._resources, this._defaultResource, this.requestFilter, this.responseFilter);
+  _ApplicationImpl(this._resourceForPath, this._defaultResource, this.requestFilter, this.responseFilter);
   
   Request filterRequest(final Request request) => 
       requestFilter(request);
@@ -47,10 +48,7 @@ class _ApplicationImpl implements Application {
       responseFilter(response);
   
   IOResource route(final Request request) =>
-      _resources.firstWhere((final IOResource resource) => 
-          resource.route.matches(request.uri),
-        orElse: () => 
-            _defaultResource);
+      _resourceForPath(request.uri.path).orElse(_defaultResource);
   
   Future writeError(final Request request, final Response response, final StreamSink<List<int>> msgSink) =>
       writeString(request, response, msgSink);
