@@ -3,11 +3,6 @@ part of restlib.server.io;
 class Router {
   static const Router EMPTY = const Router._internal(Option.NONE, Persistent.EMPTY_DICTIONARY);
   
-  final Option<IOResource> value;
-  final ImmutableDictionary<String, Router> children;
-  
-  const Router._internal(this.value, this.children);
-  
   static String _routeSegmentToKey(final String segment) {
     if (segment.startsWith("*")) {
       return "*";
@@ -15,6 +10,23 @@ class Router {
       return ":";
     } else {
       return segment;
+    }
+  }
+  
+  final Option<IOResource> value;
+  final ImmutableDictionary<String, Router> children;
+  
+  const Router._internal(this.value, this.children);
+
+  int get hashCode =>
+      computeHashCode([value, children]);
+  
+  bool operator==(other) {
+    if (identical(this, other)) {
+      return true;
+    } else if (other is Router) {
+      return this.value == other.value &&
+          this.children == other.children;
     }
   }
   
