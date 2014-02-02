@@ -71,14 +71,14 @@ class Router {
   Option<IOResource> call(final Path path) =>
       this[path];
   
-  Router put(final IOResource resource) =>
-      _doPut(checkNotNull(checkNotNull(resource).route), resource);
+  Router add(final IOResource resource) =>
+      _doAdd(checkNotNull(checkNotNull(resource).route), resource);
   
-  Router putAll(Iterable<IOResource> resources) =>
+  Router addAll(Iterable<IOResource> resources) =>
       resources.fold(this, (final Router acc, final IOResource resource) => 
-          acc.put(resource)); 
+          acc.add(resource)); 
   
-  Router _doPut(final Sequence<String> route, final IOResource resource) {    
+  Router _doAdd(final Sequence<String> route, final IOResource resource) {    
     if (route.isEmpty) {
       return new Router._internal(new Option(resource), this._children);
     } else {
@@ -89,9 +89,9 @@ class Router {
       
       final Router newChild = _children[key]
         .map((final Router next) =>
-          next._doPut(tail, resource))
+          next._doAdd(tail, resource))
         .orCompute(() =>
-            Router.EMPTY._doPut(tail, resource));
+            Router.EMPTY._doAdd(tail, resource));
       return new Router._internal(this._resource, _children.put(key, newChild));
     }
   }
