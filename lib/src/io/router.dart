@@ -30,20 +30,23 @@ class Router {
     }
   }
   
-  Option<IOResource> operator[](final Sequence<String> path) {
+  Option<IOResource> operator[](final Path path) =>
+      _doPathLookup(path);
+
+  Option<IOResource> _doPathLookup(final Sequence<String> path) {
     if (path.isEmpty) {
       return _resource;
     } else {
       Sequence<String> tail = path.subSequence(1, path.length - 1);
 
       for(final Router nextRouter in _children[path.first]) {
-        for(final IOResource resource in nextRouter[tail]) {
+        for(final IOResource resource in nextRouter._doPathLookup(tail)) {
           return new Option(resource);
         }       
       }
       
       for(final Router nextRouter in _children[":"]) {
-        for (final IOResource resource in nextRouter[tail]) {
+        for (final IOResource resource in nextRouter._doPathLookup(tail)) {
           return new Option(resource);
         }
       }
@@ -53,7 +56,7 @@ class Router {
           final Sequence<String> newTail = tail.subSequence(1, tail.length - 1); 
           
           for(final Router childRouter in nextRouter._children[tail.first]){
-            return childRouter[newTail];
+            return childRouter._doPathLookup(newTail);
           }
 
           tail = newTail;
@@ -65,7 +68,7 @@ class Router {
     }
   }
   
-  Option<IOResource> call(final Sequence<String> path) =>
+  Option<IOResource> call(final Path path) =>
       this[path];
   
   Router put(final IOResource resource) =>
