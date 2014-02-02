@@ -20,7 +20,8 @@ routeTests() {
   
   doTestParseInvalid(String testCase) {
     test("ROUTE.parse($testCase) throws StateError", (){
-      expect(() => ROUTE.parse(testCase).value, throwsStateError);
+      expect(() => 
+          ROUTE.parse(testCase).value, throwsStateError);
     });
   }
   
@@ -30,18 +31,15 @@ routeTests() {
     });
   }
   
-  doParsePathParameters("/a/:b/*c/:g/:h/i", "/a/b/c/d/e/f/g/h/i", 
-                        Persistent.EMPTY_DICTIONARY.putAllFromMap({"b" : "b", "c" : "c/d/e/f", "g" : "g", "h" : "h"}));
   doParsePathParameters("/a/:b/c/:d", "/a/b/c/d",
                         Persistent.EMPTY_DICTIONARY.putAllFromMap({"b" : "b", "d" : "d"}));
-  doParsePathParameters("/a/:b/c/:d/", "/a/b/c/d/",
+  doParsePathParameters("/a/:b/c/:d", "/a/b/c/d/",
                         Persistent.EMPTY_DICTIONARY.putAllFromMap({"b" : "b", "d" : "d"}));
   doParsePathParameters("/a/*b", "/a/b/c/d/e/f/g/h/i",
                         Persistent.EMPTY_DICTIONARY.putAllFromMap({"b" : "b/c/d/e/f/g/h/i"}));
   
-  doTestMatches("/a/:b/*c/:g/:h/i", "/a/b/c/d/e/f/g/h/i", true);
   doTestMatches("/a/:b/c/:d", "/a/b/c/d", true);
-  doTestMatches("/a/:b/c/:d/", "/a/b/c/d/", true);
+  doTestMatches("/a/:b/c/:d", "/a/b/c/d/", true);
   doTestMatches("/a/*b", "/a/b/c/d/e/f/g/h/i", true);
   doTestMatches("/a/b/c/d", "/a/b/c/d", true);
   
@@ -50,8 +48,5 @@ routeTests() {
   doTestParseInvalid("/a/*b/c/*b");
   doTestParseInvalid("/a/*b/c/:b");
   
-  doTestParseValid("/a/*b/:c/:d/e/*f", "/a/*b/:c/:d/e/*f"); 
   doTestParseValid("/a/c/d/e", "/a/c/d/e");
-  doTestParseValid("/a/*b/:c/:d", "/a/*b/:c/:d");
-  
 }

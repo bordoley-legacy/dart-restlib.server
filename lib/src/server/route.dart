@@ -1,91 +1,89 @@
 part of restlib.server;
 
-// FIXME: Wrong = 
-final Parser _PCHAR = noneOf("/").many1().map(objectToString);
+final RuneMatcher _NOT_SLASH = FORWARD_SLASH.negate();
 
-final Parser<_GlobSegment> _GLOB =
-  (GLOB + _PCHAR)
-    .map((final Iterable e) =>
-        new _GlobSegment(e.elementAt(1)));
+final Parser<String> _GLOB_SEGMENT = 
+  (ASTERISK + _NOT_SLASH.many1()).map((final Iterable e) => 
+      "*${e.elementAt(1)}");
 
-final Parser<_ParameterSegment> _PARAMETER =
-  (COLON + _PCHAR)
-    .map((final Iterable e) =>
-      new _ParameterSegment(e.elementAt(1)));
+final Parser<String> _PARAMETER_SEGMENT =
+  (COLON + _NOT_SLASH.many1()).map((final Iterable e) =>
+      ":${e.elementAt(2)}");
 
-final Parser<_ValueSegment> _VALUE =
-  _PCHAR.optional().map((final Option<String> seg) =>
-      seg.isEmpty ? _EMPTY_SEGMENT : new _ValueSegment(seg.value));  
+final Parser<Route> ROUTE = 
+  (PCHAR.orElse("") | _GLOB_SEGMENT | _PARAMETER_SEGMENT).sepBy(FORWARD_SLASH).map((final Iterable<String> e) {    
+    final MutableSet<String> keys = new MutableSet.hash();
+    Option<String> previous = Option.NONE;
+    
+    for (final String seg in e) {
+      // Prevent duplicate keys in the route
+      final Option<String> glob = _globSegment(seg);
+      final Option<String> parameter = _parameterSegment(seg);
 
-// FIXME: Clearly Either<> needs to provide methods to make this easier to unfold.
-final Parser<_RouteSegment> _ROUTE_SEGMENT =
-  (_GLOB ^ _PARAMETER ^ _VALUE)
-    .map((final Either segment) => 
-        segment.fold(
-            (final Either left) => left.value,
-            (final _RouteSegment right) => right));
-
-Parser<Route> ROUTE =
-  _ROUTE_SEGMENT.sepBy(FORWARD_SLASH)
-    .map((final Iterable<_RouteSegment> e) {
-      // FIXME: Fix MutableHashSet and use it.
-      final Set<String> keys = new Set();
-      
-      _RouteSegment previous = null;
-      
-      for (final _RouteSegment seg in e) {
-        // Prevent duplicate keys in the route
-        if (((seg is _GlobSegment) || (seg is _ParameterSegment)) &&
-            keys.contains(seg.name)) {
-          return null; 
-        }
-        
-        // Prevent multiple glob segments one after another
-        if ((seg is _GlobSegment) && (previous is _GlobSegment)) {
-          return null;
-        }
-        
-        previous = seg;
-        keys.add(seg.name);
+      if ((glob.isNotEmpty || parameter.isNotEmpty) && keys.contains(seg.substring(1))) {
+        return null; 
       }
       
-      return new Route._internal(e);
-    });
-            
+      glob.map(keys.add);
+      parameter.map(keys.add);
+      
+      // Prevent multiple glob segments one after another
+      if ((glob.isNotEmpty || parameter.isNotEmpty) && previous.isNotEmpty) {
+        return null;
+      }
+      
+      previous = glob;
+    }
+    
+    return new _Route(Persistent.EMPTY_SEQUENCE.addAll(e));
+  });
 
-const _RouteSegment _EMPTY_SEGMENT = const _ValueSegment("");    
 
-abstract class _RouteSegment {
-  String get name;
+Option<String> _globSegment(final String segment) =>
+    segment.startsWith("*") ? new Option(segment.substring(1)) : Option.NONE;
+    
+Option<String> _parameterSegment(final String segment) =>
+    segment.startsWith(":") ? new Option(segment.substring(1)) : Option.NONE;     
+
+abstract class Route implements ImmutableSequence<String> {
+  static final Route EMPTY = new _Route(Persistent.EMPTY_SEQUENCE);
+  
+  Route add(String value);
+  Route addAll(Iterable<String> elements);
+  bool matches(final URI uri);
+  ImmutableDictionary<String, String> parsePathParameters(URI uri);
+  Route push(String value);
+  Route put(int key, String value);
+  Route putAll(Iterable<Pair<int, String>> other);
+  Route putPair(Pair<int, String> pair);
+  Route remove(String element);
+  Route removeAt(int key);
 }
 
-class _GlobSegment implements _RouteSegment {
-  final String name;
-  const _GlobSegment(this.name);
+class _Route
+    extends Object
+    with ForwardingSequence<String>,
+      ForwardingAssociative<int, String>,
+      ForwardingIterable<String>
+    implements Route {
+  final ImmutableSequence<String> delegate;
   
-  String toString() => "*$name";
-}
-
-class _ParameterSegment implements _RouteSegment {
-  final String name;
-  const _ParameterSegment(this.name);
+  _Route(this.delegate);
   
-  String toString() => ":$name";
-}
-
-class _ValueSegment implements _RouteSegment {
-  final String name;
-  const _ValueSegment(this.name);
+  Route get tail =>
+      new _Route(delegate.tail);
   
-  String toString() => name;
-}
-
-class Route {    
-  final Iterable<_RouteSegment> _segments;
+  Route add(final String value) =>
+      // FIXME: validate
+      new _Route(delegate.add(value));
   
-  const Route._internal(this._segments);
+  Route addAll(final Iterable<String> elements) =>
+      new _Route(delegate.addAll(elements.map((final String segment) {
+        // FIXME: validate segment
+        return segment;
+      })));
   
-  bool matches(URI uri) {
+  bool matches(final URI uri) {
     try {
       parsePathParameters(uri);
       return true;
@@ -94,48 +92,82 @@ class Route {
     }
   }
   
-  Dictionary<String, String> parsePathParameters(URI uri) {    
-    Map<String, String> retval = new Map();
-
-    Path path = uri.path.canonicalize();
+  ImmutableDictionary<String, dynamic> parsePathParameters(final URI uri) {  
+    ImmutableDictionary<String, dynamic> retval = Persistent.EMPTY_DICTIONARY;
+    final Path path = uri.path.canonicalize();
     
     int i = 0, j = 0;
-    for (; i < _segments.length && j < path.length; i++, j++) {
-      _RouteSegment routeSegment = _segments.elementAt(i);
-      String pathSegment = path.elementAt(j);
+    for (; i < length && j < path.length; i++, j++) {
+      final String routeSegment = this.elementAt(i);
+      final String pathSegment = path.elementAt(j);
       
-      if (routeSegment is _GlobSegment) {
-        String key = routeSegment.name;
-        
-        String stopSegment = (i+1 < _segments.length) ? _segments.elementAt(i+1).name : "";
-        StringBuffer buffer = new StringBuffer("$pathSegment");
-        
-        for(j++; j < path.length; j++) {
-          if (path.elementAt(j) != stopSegment) {
-            buffer.write("/${path.elementAt(j)}");
-          } else {
-            j--;
-            break;
+      retval = _globSegment(routeSegment)
+        .map((final String name) {
+          final Option<String> stopSegment = this[i+1];
+          Path globPath = Path.EMPTY.add(pathSegment);
+          
+          for(j++; j < path.length; j++) {
+            final String segment = path.elementAt(j);
+            if (!stopSegment.contains(segment)) {
+              globPath = globPath.add(segment);
+            } else {
+              j--;
+              break;
+            }
           }
-        }
-        
-        retval[key] = buffer.toString();
-        
-      } else if (routeSegment is _ParameterSegment) {
-        String key = routeSegment.name;
-        retval[key] = pathSegment;
-        
-      } else if (routeSegment.name != pathSegment) {
-        throw new ArgumentError("$uri does not match route $this");
-      }  
+          
+          // FIXME: Actually returning a path could be a nice feature
+          return retval.put(name, globPath.toString());      
+        }).orCompute(() =>
+            _parameterSegment(routeSegment)
+              .map((final String name) =>
+                  retval.put(name, pathSegment))
+              .orCompute(() =>
+                  routeSegment == pathSegment ? 
+                      retval : throw new ArgumentError("$uri does not match route $this")));
     }
     
-    if (i < _segments.length || j < path.length) {
+    if (i < length || j < path.length) {
       throw new ArgumentError("$uri does not match route $this");
     }
     
-    return Persistent.EMPTY_DICTIONARY.putAllFromMap(retval);
+    return retval;
   }
   
-  String toString() => _segments.join("/");
+  Route push(final String value) =>
+      add(value);
+  
+  Route pushAll(final Iterable<String> elements) =>
+      new _Route(delegate.pushAll(elements.map((final String segment) {
+        // FIXME: validate segment
+        return segment;
+      })));
+
+  Route put(final int key, final String segment) {
+    // FIXME: validate segment
+    new _Route(delegate.put(key, segment));
+  }
+  
+  Route putAll(final Iterable<Pair<int, String>> other) {
+    checkNotNull(other);
+    return other.fold(this, (final Route route, final Pair<int,String> pair) =>
+        route.putPair(pair));
+  }
+  
+  Route putAllFromMap(final Map<int, String> map) =>
+      putAll(new Dictionary.wrapMap(map));
+  
+  Route putPair(final Pair<int, String> pair) {
+    checkNotNull(pair);
+    return put(pair.fst, pair.snd);
+  }
+      
+  Route remove(final String element) =>
+      new _Route(delegate.remove(element));
+  
+  Route removeAt(final int key) =>
+      new _Route(delegate.removeAt(key));
+
+  String toString() => 
+      join("/");
 }
