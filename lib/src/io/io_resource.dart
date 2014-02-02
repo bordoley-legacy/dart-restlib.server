@@ -24,8 +24,9 @@ abstract class ForwardingIOResource<T> implements Forwarder, IOResource<T> {
 class _NotFoundIOResource implements IOResource {
   const _NotFoundIOResource();
 
+  // FIXME: Route.ANY?
   Route get route => 
-      Resource.NOT_FOUND.route;
+      null;
   
   Request filterRequest(final Request request) =>
       request;
@@ -33,11 +34,11 @@ class _NotFoundIOResource implements IOResource {
   Response filterResponse(final Response response) =>
       response;
   
-  Future<Response> handle(final Request request) => 
-      Resource.NOT_FOUND.handle(request);
+  Future<Response> handle(Request request) => 
+      CLIENT_ERROR_NOT_FOUND;
   
-  Future<Response> acceptMessage(final Request request) => 
-      Resource.NOT_FOUND.acceptMessage(request);
+  Future<Response> acceptMessage(Request request) => 
+      CLIENT_ERROR_NOT_FOUND;
   
   // Strictly speaking this method should never be called, but add implementation as prevention.
   Future<Request> parse(final Request request, final Stream<List<int>> msgStream) =>

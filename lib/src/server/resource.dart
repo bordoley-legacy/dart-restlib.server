@@ -1,8 +1,6 @@
 part of restlib.server;
 
-abstract class Resource<T> {
-  static const Resource NOT_FOUND = const _NotFoundResource();
-  
+abstract class Resource<T> {  
   factory Resource.authorizingResource(final Resource<T> delegate, final Iterable<Authorizer> authorizer) {
     final ImmutableDictionary<String, Authorizer> authorizerMap = 
         Persistent.EMPTY_DICTIONARY.putAll(authorizer.map((final Authorizer authorizer) =>
@@ -33,24 +31,6 @@ abstract class Resource<T> {
   Response filterResponse(final Response response);
   Future<Response> handle(Request request);
   Future<Response> acceptMessage(Request<T> request);
-}
-
-class _NotFoundResource implements Resource {
-  const _NotFoundResource();
-  
-  Route get route => null;
-  
-  Request filterRequest(final Request request) =>
-      request;
-  
-  Response filterResponse(final Response response) =>
-      response;
-  
-  Future<Response> handle(Request request) => 
-      CLIENT_ERROR_NOT_FOUND;
-  
-  Future<Response> acceptMessage(Request request) => 
-      CLIENT_ERROR_NOT_FOUND;
 }
 
 abstract class ForwardingResource<T> implements Forwarder, Resource<T> {    
