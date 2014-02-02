@@ -2,7 +2,7 @@ part of restlib.server.io;
 
 abstract class Application {
   factory Application(
-      Option<IOResource> resourceForPath(final Sequence<String> path),
+      Option<IOResource> resourceForPath(final Path path),
       {final IOResource defaultResource : IOResource.NOT_FOUND,
        Request requestFilter(Request request) : identity,
        Response responseFilter(Response response) : identity}) =>
@@ -30,22 +30,20 @@ abstract class ForwardingApplication implements Forwarder, Application {
       delegate.writeError(request, response, msgSink);
 }
 
-typedef Request _RequestFilter(Request request);
-typedef Response _ResponseFilter(Response response);
-typedef Option<IOResource> _ResourceForPath(final Sequence<String> path);
+typedef Option<IOResource> _ResourceForPath(final Path path);
 class _ApplicationImpl implements Application {  
   final IOResource _defaultResource;
   final _ResourceForPath _resourceForPath;
-  final _RequestFilter requestFilter;
-  final _ResponseFilter responseFilter;
+  final RequestFilter _requestFilter;
+  final ResponseFilter _responseFilter;
   
-  _ApplicationImpl(this._resourceForPath, this._defaultResource, this.requestFilter, this.responseFilter);
+  _ApplicationImpl(this._resourceForPath, this._defaultResource, this._requestFilter, this._responseFilter);
   
   Request filterRequest(final Request request) => 
-      requestFilter(request);
+      _requestFilter(request);
   
   Response filterResponse(final Response response) => 
-      responseFilter(response);
+      _responseFilter(response);
   
   IOResource route(final Request request) =>
       _resourceForPath(request.uri.path).orElse(_defaultResource);
