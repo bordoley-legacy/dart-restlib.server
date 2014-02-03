@@ -1,7 +1,7 @@
 part of restlib.server;
 
 abstract class Authorizer {
-  factory Authorizer.basicAuth(String realm, Future<bool> authenticate(String username, String pwd)) =>
+  factory Authorizer.basicAuth(String realm, Future<bool> authenticate(Request request, String username, String pwd)) =>
       new _BasicAuthorizer(realm, authenticate);
       
   ChallengeMessage get authenticationChallenge;
@@ -21,7 +21,7 @@ abstract class ForwardingAuthorizer implements Authorizer, Forwarder {
       delegate.authenticate(request);
 }
 
-typedef Future<bool> _AuthenticateUserNamePwd(String username, String pwd);
+typedef Future<bool> _AuthenticateUserNamePwd(Request request, String username, String pwd);
 class _BasicAuthorizer implements Authorizer {
   static final Future<bool> falseFuture = new Future.value(false);
   
@@ -43,7 +43,7 @@ class _BasicAuthorizer implements Authorizer {
       if(splitCharIndex > 0 && splitCharIndex < (userPwd.length -1)) {
         final String user = userPwd.substring(0, splitCharIndex);
         final String pwd = userPwd.substring(splitCharIndex + 1);
-        return authenticateUserAndPwd(user, pwd);
+        return authenticateUserAndPwd(request, user, pwd);
       } else {
         return falseFuture;
       }  
