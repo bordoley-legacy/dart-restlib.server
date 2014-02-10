@@ -130,7 +130,7 @@ class _ByteRangeResource<T>
     final ContentInfo contentInfo =
         response.contentInfo
           .with_(
-            mediaRange: MediaRange.MULTIPART_BYTE_RANGE
+            mediaRange: MULTIPART_BYTE_RANGE
               .with_(parameters: Persistent.EMPTY_SET_MULTIMAP.put("boundary", boundary)))
           .without(length : true);
     

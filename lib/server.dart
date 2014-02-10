@@ -16,6 +16,7 @@ import "package:restlib_common/preconditions.dart";
 import "package:restlib_parsing/parsing.dart";
 
 import "package:restlib_core/data.dart";
+import "package:restlib_core/data.mediaranges.dart";
 import "package:restlib_core/http.dart";
 import "package:restlib_core/multipart.dart";
 import "package:restlib_core/net.dart";
