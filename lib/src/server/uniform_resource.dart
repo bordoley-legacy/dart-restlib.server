@@ -124,10 +124,10 @@ class _UniformResource<T> implements Resource<T> {
   }
   
   Request filterRequest(final Request request) =>
-      request;
+      _delegate.filterRequest(request);
   
   Response filterResponse(final Response response) =>
-      response;
+      _delegate.filterResponse(response);
   
   Future<Response<T>> handle(final Request request) {
     
@@ -199,6 +199,12 @@ abstract class UniformResourceDelegate<T> {
   
   Future<Response> delete(Request request) =>
       throw new UnimplementedError();
+  
+  Request filterRequest(Request request) =>
+      request;
+  
+  Response filterResponse(Response response) =>
+      response;
   
   Future<Response> get(Request request) =>
       throw new UnimplementedError();
