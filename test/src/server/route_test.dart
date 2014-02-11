@@ -4,8 +4,8 @@ routeTests() {
   doParsePathParameters(String route, String uri, Dictionary<String, String> expected) {
     test("$route.parsePathParameters($uri)", (){
       Route testRoute = ROUTE.parseValue(route);
-      URI testUri = URI_.parseValue(uri);
-      Dictionary result = testRoute.parsePathParameters(testUri);
+      Path testPath = PATH.parseValue(uri);
+      Dictionary result = testRoute.parametersFromPath(testPath);
       expect(result, equals(expected));
     });  
   }

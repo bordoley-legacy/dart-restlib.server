@@ -54,7 +54,8 @@ abstract class Route implements ImmutableSequence<String> {
   
   Route add(String value);
   Route addAll(Iterable<String> elements);
-  ImmutableDictionary<String, String> parsePathParameters(URI uri);
+  ImmutableDictionary<String, String> parametersFromPath(Path path);
+  Path pathForParameters(final Dictionary<String, String> params);
   Route push(String value);
   Route put(int key, String value);
   Route putAll(Iterable<Pair<int, String>> other);
@@ -86,9 +87,9 @@ class _Route
         return segment;
       })));
   
-  ImmutableDictionary<String, dynamic> parsePathParameters(final URI uri) {  
+  ImmutableDictionary<String, dynamic> parametersFromPath(Path path) {  
     ImmutableDictionary<String, dynamic> retval = Persistent.EMPTY_DICTIONARY;
-    final Path path = uri.path.canonicalize();
+    path = path.canonicalize();
     
     int i = 0, j = 0;
     for (; i < length && j < path.length; i++, j++) {
@@ -118,15 +119,27 @@ class _Route
                   retval.put(name, pathSegment))
               .orCompute(() =>
                   routeSegment == pathSegment ? 
-                      retval : throw new ArgumentError("$uri does not match route $this")));
+                      retval : throw new ArgumentError("$path does not match route $this")));
     }
     
     if (i < length || j < path.length) {
-      throw new ArgumentError("$uri does not match route $this");
+      throw new ArgumentError("$path does not match route $this");
     }
     
     return retval;
   }
+  
+  Path pathForParameters(final Dictionary<String, String> params) =>
+      fold(Path.EMPTY, (final Path path, final String segment) =>
+          _globSegment(segment).map((final String segment) {
+              checkArgument(params.containsKey(segment));
+              return path.add(params[segment].value);
+          }).orCompute(() =>
+              _parameterSegment(segment).map((final String name) {
+                checkArgument(params.containsKey(segment));
+                return path.add(params[segment].value);
+              }).orCompute(() => 
+                  path.add(segment))));
   
   Route push(final String value) =>
       add(value);
