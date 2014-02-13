@@ -49,9 +49,22 @@ Option<String> _globSegment(final String segment) =>
 Option<String> _parameterSegment(final String segment) =>
     segment.startsWith(":") ? new Option(segment.substring(1)) : Option.NONE;     
 
+class RouteParameterType {
+  static const GLOB = const RouteParameterType._internal(0);
+  static const SEGMENT = const RouteParameterType._internal(1);
+
+  static Iterable<RouteParameterType> get values => 
+      const[GLOB, SEGMENT];
+
+  final int _value;
+
+  const RouteParameterType._internal(this._value);
+}
+    
 abstract class Route implements ImmutableSequence<String> {
   static final Route EMPTY = new _Route(Persistent.EMPTY_SEQUENCE);
   
+  ImmutableDictionary<String, RouteParameterType> get parameters;
   Route add(String value);
   Route addAll(Iterable<String> elements);
   ImmutableDictionary<String, String> parametersFromPath(Path path);
@@ -73,6 +86,19 @@ class _Route
   final ImmutableSequence<String> delegate;
   
   _Route(this.delegate);
+  
+  ImmutableDictionary<String, RouteParameterType> get parameters {
+    ImmutableDictionary<String, RouteParameterType> retval = Persistent.EMPTY_DICTIONARY;
+    
+    this.forEach((final String segment) =>
+        _globSegment(segment)
+          .map((final String parameter) =>
+              retval = retval.put(parameter, RouteParameterType.GLOB))
+          .orCompute(() =>
+              _parameterSegment(segment).map((final String parameter) =>
+                  retval = retval.put(parameter, RouteParameterType.SEGMENT))));
+    return retval;
+  }
   
   Route get tail =>
       new _Route(delegate.tail);
