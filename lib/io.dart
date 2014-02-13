@@ -5,7 +5,6 @@ import "dart:convert";
 
 import "package:restlib_common/collections.dart";
 import "package:restlib_common/collections.immutable.dart";
-import "package:restlib_common/io.dart";
 import "package:restlib_common/objects.dart";
 import "package:restlib_common/preconditions.dart";
 

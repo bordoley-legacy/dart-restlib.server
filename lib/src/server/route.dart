@@ -150,10 +150,9 @@ class _Route
         return segment;
       })));
 
-  Route put(final int key, final String segment) {
-    // FIXME: validate segment
-    new _Route(delegate.put(key, segment));
-  }
+  Route put(final int key, final String segment) =>
+      // FIXME: validate segment
+      new _Route(delegate.put(key, segment));
   
   Route putAll(final Iterable<Pair<int, String>> other) {
     checkNotNull(other);

@@ -25,6 +25,8 @@ class Router {
     } else if (other is Router) {
       return this._resource == other._resource &&
           this._children == other._children;
+    } else {
+      return false;
     }
   }
   
