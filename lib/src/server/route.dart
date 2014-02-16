@@ -39,7 +39,7 @@ final Parser<Route> ROUTE =
       previous = glob;
     }
     
-    return new _Route(Persistent.EMPTY_SEQUENCE.addAll(e));
+    return new _Route(EMPTY_SEQUENCE.addAll(e));
   });
 
 
@@ -62,7 +62,7 @@ class RouteParameterType {
 }
     
 abstract class Route implements ImmutableSequence<String> {
-  static final Route EMPTY = new _Route(Persistent.EMPTY_SEQUENCE);
+  static final Route EMPTY = new _Route(EMPTY_SEQUENCE);
   
   ImmutableDictionary<String, RouteParameterType> get parameters;
   Route add(String value);
@@ -88,7 +88,7 @@ class _Route
   _Route(this.delegate);
   
   ImmutableDictionary<String, RouteParameterType> get parameters {
-    ImmutableDictionary<String, RouteParameterType> retval = Persistent.EMPTY_DICTIONARY;
+    ImmutableDictionary<String, RouteParameterType> retval = EMPTY_DICTIONARY;
     
     this.forEach((final String segment) =>
         _globSegment(segment)
@@ -114,7 +114,7 @@ class _Route
       })));
   
   ImmutableDictionary<String, dynamic> parametersFromPath(Path path) {  
-    ImmutableDictionary<String, dynamic> retval = Persistent.EMPTY_DICTIONARY;
+    ImmutableDictionary<String, dynamic> retval = EMPTY_DICTIONARY;
     path = path.canonicalize();
     
     int i = 0, j = 0;

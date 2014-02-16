@@ -27,7 +27,7 @@ class _ContentTypeResponseWriter implements ResponseWriter {
 
 class _AlwaysProvidesResponseWriterProvider implements ResponseWriterProvider {
   final Option<ResponseWriter> responseWriter;
-  final FiniteSet<Header> variesOn = Persistent.EMPTY_SET;
+  final FiniteSet<Header> variesOn = EMPTY_SET;
   
   _AlwaysProvidesResponseWriterProvider(final ResponseWriter responseWriter) :
     this.responseWriter = new Option(responseWriter);
@@ -43,7 +43,7 @@ class _ContentTypeResponseWriterProvider implements ResponseWriterProvider {
   
   _ContentTypeResponseWriterProvider(this.responseWritersForEntity);
   
-  FiniteSet<Header> variesOn = Persistent.EMPTY_SET.add(Header.ACCEPT);
+  FiniteSet<Header> variesOn = EMPTY_SET.add(Header.ACCEPT);
   
   Option<ResponseWriter> apply(Request request, Response response) =>
       responseWritersForEntity(request, response)

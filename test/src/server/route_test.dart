@@ -24,11 +24,11 @@ routeTests() {
   }
   
   doParsePathParameters("/a/:b/c/:d", "/a/b/c/d",
-                        Persistent.EMPTY_DICTIONARY.putAllFromMap({"b" : "b", "d" : "d"}));
+                        EMPTY_DICTIONARY.putAllFromMap({"b" : "b", "d" : "d"}));
   doParsePathParameters("/a/:b/c/:d", "/a/b/c/d/",
-                        Persistent.EMPTY_DICTIONARY.putAllFromMap({"b" : "b", "d" : "d"}));
+                        EMPTY_DICTIONARY.putAllFromMap({"b" : "b", "d" : "d"}));
   doParsePathParameters("/a/*b", "/a/b/c/d/e/f/g/h/i",
-                        Persistent.EMPTY_DICTIONARY.putAllFromMap({"b" : "b/c/d/e/f/g/h/i"}));
+                        EMPTY_DICTIONARY.putAllFromMap({"b" : "b/c/d/e/f/g/h/i"}));
   
   doTestParseInvalid("/a/*b/:c/:d/*c/e");
   doTestParseInvalid("/a/*b/*d");

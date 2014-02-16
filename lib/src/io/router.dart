@@ -1,7 +1,7 @@
 part of restlib.server.io;
 
 class Router {
-  static const Router EMPTY = const Router._internal(Option.NONE, Persistent.EMPTY_DICTIONARY);
+  static const Router EMPTY = const Router._internal(Option.NONE, EMPTY_DICTIONARY);
   
   static String _routeSegmentToKey(final String segment) {
     if (segment.startsWith(":")) {

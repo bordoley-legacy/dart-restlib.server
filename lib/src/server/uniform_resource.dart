@@ -188,7 +188,7 @@ abstract class UniformResourceDelegate<T> {
     testMethod(Method.POST, delegate.post);
     testMethod(Method.PUT, delegate.put);
 
-    return Persistent.EMPTY_SET.addAll(set);
+    return EMPTY_SET.addAll(set);
   }
   
   bool get requireETagForUpdate;

@@ -87,7 +87,7 @@ class _ByteRangeResource<T>
                                   final ImmutableSequence<Either<ByteRangeSpec, SuffixByteRangeSpec>> ranges,
                                   final int entityLength) {
     final ImmutableSequence<Part<ByteStreamable>> parts =
-        Persistent.EMPTY_SEQUENCE.addAll(
+        EMPTY_SEQUENCE.addAll(
             ranges
               .map((final Either<ByteRangeSpec, SuffixByteRangeSpec> range) =>
                   _contentInfoForByteRangeSetItem(response.contentInfo, range, entityLength))
@@ -131,7 +131,7 @@ class _ByteRangeResource<T>
         response.contentInfo
           .with_(
             mediaRange: MULTIPART_BYTE_RANGE
-              .with_(parameters: Persistent.EMPTY_SET_MULTIMAP.put("boundary", boundary)))
+              .with_(parameters: EMPTY_SET_MULTIMAP.put("boundary", boundary)))
           .without(length : true);
     
     final ByteStreamableMultipart entity = new ByteStreamableMultipart(boundary, parts);
