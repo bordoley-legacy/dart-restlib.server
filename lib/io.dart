@@ -29,33 +29,33 @@ ApplicationSupplier virtualHostApplicationSupplier(Option<Application> applicati
           .orElse(fallback);
 
 Future<Request<String>> parseString(final Request request, final Stream<List<int>> msgStream){
-  final Charset charset = 
+  final Charset charset =
       request.contentInfo.mediaRange
-        .flatMap((final MediaRange mediaRange) => 
+        .flatMap((final MediaRange mediaRange) =>
             mediaRange.charset)
         .orElse(Charset.UTF_8);
-  
+
   return charset.codec
-    .map((final Encoding codec) => 
+    .map((final Encoding codec) =>
         codec.decodeStream(msgStream)
-          .then((final String requestBody) => 
+          .then((final String requestBody) =>
               request.with_(entity: requestBody)))
-    .orCompute(() => 
+    .orCompute(() =>
         new Future.error("Request charset preference is unsupported."));
 }
 
 Future writeString(final Request<String> request, final Response response, final StreamSink<List<int>> msgSink) {
-  final Charset charset = 
+  final Charset charset =
       response.contentInfo.mediaRange
-        .flatMap((final MediaRange mr) => 
+        .flatMap((final MediaRange mr) =>
             mr.charset)
         .orElse(Charset.UTF_8);
-   
+
   return charset.codec
       .map((final Encoding codec) {
         msgSink.add(codec.encode(response.entity.value.toString()));
-        return new Future.value();   
-      }).orCompute(() => 
+        return new Future.value();
+      }).orCompute(() =>
           new Future.error("${charset.toString()} is unsupported"));
 }
 
@@ -63,21 +63,17 @@ Future writeMultipart(final Request request, final Response<ByteStreamableMultip
     msgSink.addStream(response.entity.value.asByteStream());
 
 Future<Request<Multipart>> parseMultipart(
-    final Request request, 
-    final Stream<List<int>> msgStream, 
+    final Request request,
+    final Stream<List<int>> msgStream,
     Option<PartParser> partParserProvider(ContentInfo contentInfo)){
   final String boundary = request.contentInfo.mediaRange.value.parameters["boundary"].value;
-  
+
   return parseMultipartStream(msgStream, boundary, partParserProvider)
       .then((final Multipart multipart) =>
-          request.with_(entity: multipart));          
+          request.with_(entity: multipart));
 }
 
 Future<Request<Form>> parseForm(final Request request, final Stream<List<int>> msgStream) =>
     parseString(request, msgStream)
       .then((final Request<String> request) =>
-          FORM.parse(request.entity.value)
-            .map((final Form form) =>
-                request.with_(entity: form))
-            .orCompute(() => 
-                new Future.error("unable to parse form encoded data")));
+          request.with_(entity: Form.parse(request.entity.value)));
