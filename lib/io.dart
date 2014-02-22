@@ -40,8 +40,7 @@ Future<Request<String>> parseString(final Request request, final Stream<List<int
         codec.decodeStream(msgStream)
           .then((final String requestBody) =>
               request.with_(entity: requestBody)))
-    .orCompute(() =>
-        new Future.error("Request charset preference is unsupported."));
+    .orCompute(() => request.with_(entity: null));
 }
 
 Future writeString(final Request<String> request, final Response response, final StreamSink<List<int>> msgSink) {
