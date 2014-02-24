@@ -111,9 +111,7 @@ class _UniformResource<T> implements Resource<T> {
   Future<Response> _conditionalGet(final Request request) {
     return _delegate.get(request)
         .then((final Response response){
-          final Status responseStatus = response.status;
-
-          if (responseStatus.statusClass != StatusClass.SUCCESS) {
+          if (response.status.statusClass != StatusClass.SUCCESS) {
             return response;
           } else if (_unmodified(request, response)) {
             return REDIRECTION_NOT_MODIFIED;
