@@ -24,7 +24,7 @@ authorizedResourceTests() {
               ChallengeMessage.parser.parseValue("basic realm=\"test\", encoding=\"UTF-8\""))]);
 
   test("Request missing Authorization header", () {
-    Request request = new Request(Method.GET, URI.parser.parseValue("http://www.example.com"));
+    Request request = new Request(GET, URI.parser.parseValue("http://www.example.com"));
     Future<Response> authResponse = mockAuthenticateTrueResource.handle(request);
     authResponse.then((Response response){
       expect(response.status, equals(Status.CLIENT_ERROR_UNAUTHORIZED));
@@ -35,7 +35,7 @@ authorizedResourceTests() {
   test("Request authorization credentials with unsupported scheme", () {
     Request request =
         new Request(
-            Method.GET,
+            GET,
             URI.parser.parseValue("http://www.example.com"),
             authorizationCredentials : ChallengeMessage.parser.parseValue("INVALID ABCD=="));
     Future<Response> authResponse = mockAuthenticateTrueResource.handle(request);
@@ -48,7 +48,7 @@ authorizedResourceTests() {
   test("Request authorization with valid credentials", (){
     Request request =
         new Request(
-            Method.GET,
+            GET,
             URI.parser.parseValue("http://www.example.com"),
             authorizationCredentials : ChallengeMessage.parser.parseValue("basic abcd=="));
     Future<Response> authResponse = mockAuthenticateTrueResource.handle(request);
@@ -61,7 +61,7 @@ authorizedResourceTests() {
   test("Request authorization with invalid credentials", (){
     Request request =
         new Request(
-            Method.GET,
+            GET,
             URI.parser.parseValue("http://www.example.com"),
             authorizationCredentials : ChallengeMessage.parser.parseValue("basic abcd=="));
     Future<Response> authResponse = mockAuthenticateFalseResource.handle(request);
