@@ -70,8 +70,8 @@ Future<Request<Multipart>> parseMultipart(
   final String boundary = request.contentInfo.mediaRange.value.parameters["boundary"].value;
 
   return parseMultipartStream(msgStream, boundary, partParserProvider)
-      .then((final Multipart multipart) =>
-          request.with_(entity: multipart));
+      .then((final Option<Multipart> multipart) =>
+          request.with_(entity: multipart.nullableValue));
 }
 
 Future<Request<Form>> parseForm(final Request request, final Stream<List<int>> msgStream) =>
