@@ -10,7 +10,7 @@ final Parser<String> _PARAMETER_SEGMENT =
   (COLON + _NOT_SLASH.many1()).map((final Iterable e) =>
       ":${e.elementAt(2)}");
 
-final Parser<Route> ROUTE =
+final Parser<Route> _ROUTE =
   (Path.segmentParser.orElse("") | _GLOB_SEGMENT | _PARAMETER_SEGMENT).sepBy(FORWARD_SLASH).map((final Iterable<String> e) {
     if (e.length == 1 && e.first.isEmpty) {
       return Route.EMPTY;
@@ -63,6 +63,7 @@ class RouteParameterType {
 
 abstract class Route implements ImmutableSequence<String> {
   static final Route EMPTY = new _Route(EMPTY_SEQUENCE);
+  static final Parser<Route> parser = _ROUTE;
 
   ImmutableDictionary<String, RouteParameterType> get parameters;
   Route add(String value);

@@ -3,7 +3,7 @@ part of restlib.server_test;
 routeTests() {
   doParsePathParameters(String route, String uri, Dictionary<String, String> expected) {
     test("$route.parsePathParameters($uri)", (){
-      Route testRoute = ROUTE.parseValue(route);
+      Route testRoute = Route.parser.parseValue(route);
       Path testPath = Path.parser.parseValue(uri);
       Dictionary result = testRoute.parametersFromPath(testPath);
       expect(result, equals(expected));
@@ -13,13 +13,13 @@ routeTests() {
   doTestParseInvalid(String testCase) {
     test("ROUTE.parse($testCase) throws StateError", (){
       expect(() =>
-          ROUTE.parseValue(testCase), throwsStateError);
+          Route.parser.parseValue(testCase), throwsStateError);
     });
   }
 
   doTestParseValid(String testCase, String expected) {
     test("ROUTE.parse($testCase)", (){
-      expect(ROUTE.parseValue(testCase).toString(), equals(expected));
+      expect(Route.parser.parseValue(testCase).toString(), equals(expected));
     });
   }
 
