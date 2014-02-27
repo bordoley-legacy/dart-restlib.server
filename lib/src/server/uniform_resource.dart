@@ -39,14 +39,14 @@ class _UniformResource<T> implements Resource<T> {
     _methodNotAllowedResponse =
       new Future.value(
            new Response(
-            Status.CLIENT_ERROR_METHOD_NOT_ALLOWED,
+            statuses.CLIENT_ERROR_METHOD_NOT_ALLOWED,
             allowedMethods : allowedMethods)),
    _optionsResponse =
      new Future.value(
          new Response(
-            Status.SUCCESS_OK,
+            statuses.SUCCESS_OK,
             allowedMethods : allowedMethods,
-            entity : Status.SUCCESS_OK.message
+            entity : statuses.SUCCESS_OK.message
           ));
 
   Route get route {
