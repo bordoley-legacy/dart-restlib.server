@@ -66,13 +66,14 @@ Future writeMultipart(final Request request, final Response<ByteStreamableMultip
 Future<Request<Multipart>> parseMultipart(
     final Request request,
     final Stream<List<int>> msgStream,
-    Option<PartParser> partParserProvider(ContentInfo contentInfo)){
-  final String boundary = request.contentInfo.mediaRange.value.parameters["boundary"].value;
-
-  return parseMultipartStream(msgStream, boundary, partParserProvider)
-      .then((final Option<Multipart> multipart) =>
-          request.with_(entity: multipart.nullableValue));
-}
+    Option<PartParser> partParserProvider(ContentInfo contentInfo)) =>
+        first(request.contentInfo.mediaRange.value.parameters["boundary"])
+          .map((final String boundary) =>
+              parseMultipartStream(msgStream, boundary, partParserProvider)
+                .then((final Option<Multipart> multipart) =>
+                    request.with_(entity: multipart.nullableValue)))
+          .orCompute(() =>
+              new Future.value(request.with_(entity : null)));
 
 Future<Request<Form>> parseForm(final Request request, final Stream<List<int>> msgStream) =>
     parseString(request, msgStream)
