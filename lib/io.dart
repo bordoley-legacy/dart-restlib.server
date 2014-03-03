@@ -45,7 +45,7 @@ Future<Request<String>> parseString(final Request request, final Stream<List<int
     .orCompute(() => request.with_(entity: null));
 }
 
-Future writeString(final Request<String> request, final Response response, final StreamSink<List<int>> msgSink) {
+Future writeString(final Request request, final Response response, final StreamSink<List<int>> msgSink) {
   final Charset charset =
       response.contentInfo.mediaRange
         .flatMap((final MediaRange mr) =>
