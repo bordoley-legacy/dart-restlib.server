@@ -13,7 +13,7 @@ class _AuthorizingResource<T> extends Object with ForwardingResource<T> {
             statuses.CLIENT_ERROR_UNAUTHORIZED,
             entity : statuses.CLIENT_ERROR_UNAUTHORIZED.reason,
             authenticationChallenges : authorizerMap.map((final Pair<String, Authorizer> pair) =>
-                pair.snd.authenticationChallenge)));
+                pair.e1.authenticationChallenge)));
 
   Future<Response> handle(final Request request) =>
       request.authorizationCredentials

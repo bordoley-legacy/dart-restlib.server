@@ -192,7 +192,7 @@ class _Route
 
   Route putPair(final Pair<int, String> pair) {
     checkNotNull(pair);
-    return put(pair.fst, pair.snd);
+    return put(pair.e0, pair.e1);
   }
 
   Route remove(final String element) =>
