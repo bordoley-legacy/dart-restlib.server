@@ -1,4 +1,4 @@
-part of restlib.server.io;
+part of server.io;
 
 abstract class IOResource<T> implements Resource<T> {
   static const IOResource NOT_FOUND = const _NotFoundIOResource();

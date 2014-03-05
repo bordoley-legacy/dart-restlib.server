@@ -1,4 +1,4 @@
-part of restlib.server;
+part of server;
 
 final RuneMatcher _NOT_SLASH = FORWARD_SLASH.negate();
 

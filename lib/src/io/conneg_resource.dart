@@ -1,4 +1,4 @@
-part of restlib.server.io;
+part of server.io;
 
 typedef Future<Request> RequestParser(final Request request, final Stream<List<int>> msgStream);
 typedef Option<RequestParser> RequestParserProvider(ContentInfo contentInfo);

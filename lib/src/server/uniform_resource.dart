@@ -1,4 +1,4 @@
-part of restlib.server;
+part of server;
 
 class _UniformResource<T> implements Resource<T> {
   static bool _unmodified(final Request request, final Response response) {

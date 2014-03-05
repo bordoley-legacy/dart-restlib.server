@@ -1,4 +1,4 @@
-part of restlib.server;
+part of server;
 
 abstract class Authorizer {
   factory Authorizer.basicAuth(String realm, Future<bool> authenticate(Request request, String username, String pwd)) =>

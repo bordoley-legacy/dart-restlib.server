@@ -1,4 +1,4 @@
-library restlib.server.io;
+library server.io;
 
 import "dart:async";
 import "dart:convert";

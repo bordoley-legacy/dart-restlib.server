@@ -1,4 +1,4 @@
-part of restlib.server;
+part of server;
 
 abstract class Resource<T> {
   factory Resource.authorizingResource(final Resource<T> delegate, final Iterable<Authorizer> authorizer) {

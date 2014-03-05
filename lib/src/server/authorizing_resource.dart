@@ -1,4 +1,4 @@
-part of restlib.server;
+part of server;
 
 class _AuthorizingResource<T> extends Object with ForwardingResource<T> {
   final ImmutableDictionary<String, Authorizer> _authorizerMap;

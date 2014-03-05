@@ -1,4 +1,4 @@
-part of restlib.server;
+part of server;
 
 class _ByteRangeResource<T>
     extends Object

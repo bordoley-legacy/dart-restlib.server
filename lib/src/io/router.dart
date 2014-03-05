@@ -1,4 +1,4 @@
-part of restlib.server.io;
+part of server.io;
 
 class Router {
   static const Router EMPTY = const Router._internal(Option.NONE, EMPTY_DICTIONARY);

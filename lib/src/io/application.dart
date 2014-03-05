@@ -1,4 +1,4 @@
-part of restlib.server.io;
+part of server.io;
 
 abstract class Application {
   factory Application(
