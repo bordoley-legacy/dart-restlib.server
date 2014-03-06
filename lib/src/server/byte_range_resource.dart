@@ -10,12 +10,10 @@ class _ByteRangeResource<T>
   _ByteRangeResource(this.delegate);
 
   Future<Response> handle(final Request request) =>
-      delegate.handle(request).then((final Response response) =>
-          _rangeResponse(request, response));
+      delegate.handle(request).then(curry1(_rangeResponse, [request]));
 
   Future<Response> acceptMessage(final Request<T> request) =>
-      delegate.acceptMessage(request).then((final Response response) =>
-          _rangeResponse(request, response));
+      delegate.acceptMessage(request).then(curry1(_rangeResponse, [request]));
 
   Future<Response> _rangeResponse(final Request request, final Response response) {
     if (response.status.statusClass != StatusClass.SUCCESS ||

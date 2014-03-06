@@ -59,8 +59,7 @@ Response addContentInfoToResponse(final Request request, final Response response
 
   Future<Response> acceptMessage(final Request<T> request) =>
       delegate.acceptMessage(request)
-        .then((final Response response) =>
-            addContentInfoToResponse(request,response));
+        .then(curry1(addContentInfoToResponse, [request]));
 
   Future<Response> handle(final Request request) =>
       delegate.handle(request)
