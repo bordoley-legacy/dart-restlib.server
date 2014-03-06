@@ -5,7 +5,6 @@ typedef Option<RequestParser> RequestParserProvider(ContentInfo contentInfo);
 typedef Future ResponseEntityWriter(Request request, Response response, StreamSink<List<int>> msgSink);
 typedef Option<ResponseWriter> ResponseWriterForMediaRange(MediaRange mediaRange);
 
-// FIXME: Should type be parameterized?
 abstract class ResponseWriter<T> {
   factory ResponseWriter.forContentType(final MediaRange mediaRange, Future write(Request request, Response<T> response, StreamSink<List<int>> msgSink)) =>
       new _ContentTypeResponseWriter(mediaRange, write);
@@ -60,8 +59,7 @@ Response addContentInfoToResponse(final Request request, final Response response
 
   Future<Response> acceptMessage(final Request<T> request) =>
       delegate.acceptMessage(request)
-        .then((final Response response) =>
-            addContentInfoToResponse(request, response));
+        .then(curry(addContentInfoToResponse, [request]));
 
   Future<Response> handle(final Request request) =>
       delegate.handle(request)

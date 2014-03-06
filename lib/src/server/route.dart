@@ -3,12 +3,12 @@ part of server;
 final RuneMatcher _NOT_SLASH = FORWARD_SLASH.negate();
 
 final Parser<String> _GLOB_SEGMENT =
-  (ASTERISK + _NOT_SLASH.many1()).map((final Iterable e) =>
-      "*${e.elementAt(1)}");
+  (ASTERISK + _NOT_SLASH.many1()).map((final Pair<int, String> e) =>
+      "*${e.e1}");
 
 final Parser<String> _PARAMETER_SEGMENT =
-  (COLON + _NOT_SLASH.many1()).map((final Iterable e) =>
-      ":${e.elementAt(2)}");
+  (COLON + _NOT_SLASH.many1()).map((final Pair<int, IterableString> e) =>
+      ":${e.e1}");
 
 final Parser<Route> _ROUTE =
   (Path.segmentParser.orElse("") | _GLOB_SEGMENT | _PARAMETER_SEGMENT).sepBy(FORWARD_SLASH).map((final Iterable<String> e) {
