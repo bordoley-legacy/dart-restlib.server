@@ -78,4 +78,4 @@ Future<Request<Multipart>> parseMultipart(
 Future<Request<Form>> parseForm(final Request request, final Stream<List<int>> msgStream) =>
     parseString(request, msgStream)
       .then((final Request<String> request) =>
-          request.with_(entity: Form.parser.parse(request.entity.value).nullableValue));
+          request.with_(entity: Form.parser.parse(request.entity.value).left.nullableValue));
