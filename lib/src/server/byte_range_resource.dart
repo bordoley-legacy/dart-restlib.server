@@ -27,7 +27,7 @@ class _ByteRangeResource<T>
       return new Future.value(response);
     }
 
-    final Range requestRange = request.preferences.range.value;
+    final data.Range requestRange = request.preferences.range.value;
     if (requestRange is ByteRangesSpecifier) {
       return _byteRangeResponse(request, response);
     } else {
